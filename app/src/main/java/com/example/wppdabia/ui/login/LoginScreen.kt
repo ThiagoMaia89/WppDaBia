@@ -48,6 +48,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import coil.compose.rememberAsyncImagePainter
 import com.example.wppdabia.R
 import com.example.wppdabia.domain.utils.ImageHandler
@@ -56,6 +57,7 @@ import com.example.wppdabia.ui.extensions.getInitials
 import com.example.wppdabia.ui.extensions.toUri
 import com.example.wppdabia.ui.theme.Typography
 import com.example.wppdabia.ui.theme.WppDaBiaTheme
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
@@ -280,17 +282,26 @@ fun LoginScreen(
                     contentColor = Color.White
                 ),
                 onClick = {
-                    // TODO: Implement Firebase login logic here
-                    // You can use Firebase Authentication to sign in with email and password
-                    // For example:
-                    // Firebase.auth.signInWithEmailAndPassword(email, password)
-                    //     .addOnCompleteListener { task ->
-                    //         if (task.isSuccessful) {
-                    //             // Sign in success, update UI with the signed-in user's information
-                    //         } else {
-                    //             // If sign in fails, display a message to the user.
-                    //         }
-                    //     }
+                    if (userName.isNotBlank() && email.isNotBlank() && password.isNotBlank()) {
+                        viewModel.viewModelScope.launch {
+                            viewModel.registerUser(
+                                name = userName,
+                                email = email,
+                                password = password,
+                                profileImageUri = imageUri,
+                                onSuccess = {
+                                    Toast.makeText(
+                                        context,
+                                        "Cadastro realizado com sucesso!",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                },
+                                onError = {
+                                    Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                                }
+                            )
+                        }
+                    }
                 }
             ) {
                 Text(
