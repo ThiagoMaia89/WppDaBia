@@ -3,8 +3,9 @@ package com.example.wppdabia.ui.extensions
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
-import android.provider.MediaStore
-import java.io.ByteArrayOutputStream
+import androidx.core.net.toUri
+import java.io.File
+import java.io.FileOutputStream
 
 fun String.getInitials(): String {
     val names = this.split(" ")
@@ -13,10 +14,9 @@ fun String.getInitials(): String {
 }
 
 fun Bitmap.toUri(context: Context): Uri {
-    val bytes = ByteArrayOutputStream()
-    compress(Bitmap.CompressFormat.JPEG, 100, bytes)
-    val path = MediaStore.Images.Media.insertImage(
-        context.contentResolver, this, "Title", null
-    )
-    return Uri.parse(path)
+    val file = File(context.cacheDir, "temp_image.jpg")
+    FileOutputStream(file).use { output ->
+        this.compress(Bitmap.CompressFormat.JPEG, 100, output)
+    }
+    return file.toUri()
 }

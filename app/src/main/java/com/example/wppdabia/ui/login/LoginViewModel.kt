@@ -18,44 +18,11 @@ import com.example.wppdabia.data.model.CachedImage
 import kotlinx.coroutines.launch
 
 class LoginViewModel : ViewModel() {
-    private val _cachedImage = MutableLiveData<CachedImage?>(null)
-    val cachedImage: LiveData<CachedImage?> = _cachedImage
+    private var _capturedImageUri = MutableLiveData<Uri?>()
+    val capturedImageUri: LiveData<Uri?> = _capturedImageUri
 
-    var capturedImageBitmap: Bitmap? by mutableStateOf(null)
-        private set
-
-    var selectedImageUri: Uri? by mutableStateOf(null)
-        private set
-
-    fun saveCapturedImage(bitmap: Bitmap) {
-        capturedImageBitmap = bitmap
+    fun saveCapturedImage(uri: Uri) {
+        _capturedImageUri.value = uri
     }
 
-    fun saveSelectedImageUri(uri: Uri) {
-        selectedImageUri = uri
-    }
-
-
-    fun saveImageToCache(context: Context, imageUri: Uri) {
-        viewModelScope.launch {
-            val key = try {
-                val request = ImageRequest.Builder(context)
-                    .data(imageUri)
-                    .target { drawable -> drawable.toBitmap().toString() }
-                    .build()
-                context.imageLoader.execute(request).request.data.toString()
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            }
-                _cachedImage.value = CachedImage(
-                    key = key,
-                    uri = imageUri
-                )
-        }
-    }
-
-    fun getCachedImage(): CachedImage? {
-        return _cachedImage.value
-    }
 }

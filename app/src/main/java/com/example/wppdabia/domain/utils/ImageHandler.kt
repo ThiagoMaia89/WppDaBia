@@ -11,13 +11,24 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import android.Manifest
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import androidx.activity.ComponentActivity
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import com.yalantis.ucrop.UCrop
+import java.io.File
 
 class ImageHandler(
     val onImageCaptured: (Bitmap) -> Unit,
-    val onImageSelected: (Uri) -> Unit
+    val onImageSelected: (Uri) -> Unit,
+    val onImageCropped: (Uri) -> Unit,
+    val onCropError: (Boolean) -> Unit
 ) {
     lateinit var cameraLauncher: ActivityResultLauncher<Void?>
     lateinit var galleryLauncher: ActivityResultLauncher<String>
+    lateinit var cropLauncher: ActivityResultLauncher<Intent>
 
     @Composable
     fun InitializeLaunchers() {
@@ -32,6 +43,16 @@ class ImageHandler(
         ) { uri ->
             uri?.let { onImageSelected(it) }
         }
+
+        cropLauncher =
+            rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    val croppedUri = UCrop.getOutput(result.data!!)
+                    croppedUri?.let { onImageCropped(it) }
+                } else {
+                    onCropError.invoke(true)
+                }
+            }
     }
 
     @Composable
@@ -51,12 +72,33 @@ class ImageHandler(
         }
 
         val context = LocalContext.current
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
             onPermissionGranted()
         } else {
             LaunchedEffect(Unit) {
                 permissionLauncher.launch(Manifest.permission.CAMERA)
             }
         }
+    }
+
+    fun startCrop(context: Context, sourceUri: Uri) {
+        val destinationUri = Uri.fromFile(File(context.cacheDir, "cropped_image.jpg"))
+
+        val options = UCrop.Options().apply {
+            setCircleDimmedLayer(true)
+            setFreeStyleCropEnabled(false)
+            setCompressionQuality(100)
+        }
+
+        val intent = UCrop.of(sourceUri, destinationUri)
+            .withOptions(options)
+            .withAspectRatio(1f, 1f)
+            .getIntent(context)
+
+        cropLauncher.launch(intent)
     }
 }

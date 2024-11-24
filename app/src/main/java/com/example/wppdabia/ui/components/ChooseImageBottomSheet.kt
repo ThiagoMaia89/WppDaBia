@@ -44,7 +44,7 @@ private fun ImagePickerBottomSheetContent(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(bottom = 32.dp,top = 16.dp, start = 16.dp, end = 16.dp)
     ) {
         Text(
             text = "Escolha uma opção",

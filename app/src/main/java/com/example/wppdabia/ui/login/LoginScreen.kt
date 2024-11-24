@@ -1,39 +1,34 @@
 package com.example.wppdabia.ui.login
 
-import android.graphics.Bitmap
-import android.net.Uri
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.result.launch
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -41,8 +36,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
@@ -53,11 +48,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.net.toUri
+import coil.compose.rememberAsyncImagePainter
 import com.example.wppdabia.R
 import com.example.wppdabia.domain.utils.ImageHandler
 import com.example.wppdabia.ui.components.ImagePickerBottomSheet
 import com.example.wppdabia.ui.extensions.getInitials
+import com.example.wppdabia.ui.extensions.toUri
 import com.example.wppdabia.ui.theme.Typography
 import com.example.wppdabia.ui.theme.WppDaBiaTheme
 
@@ -65,24 +61,36 @@ import com.example.wppdabia.ui.theme.WppDaBiaTheme
 fun LoginScreen(
     viewModel: LoginViewModel
 ) {
+    val context = LocalContext.current
     var email by remember { mutableStateOf("") }
     var userName by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var showBottomSheet by remember { mutableStateOf(false) }
-    val cachedImage = viewModel.cachedImage.observeAsState().value
+    val imageUri = viewModel.capturedImageUri.observeAsState().value
+    var isLoading by remember { mutableStateOf(false) }
+    lateinit var imageHandler: ImageHandler
 
     var requestPermission by remember { mutableStateOf(false) }
     var permissionDeniedToast by remember { mutableStateOf(false) }
+    var cropErrorToast by remember { mutableStateOf(false) }
 
-    val imageHandler = ImageHandler(
-        onImageCaptured = { bitmap ->
-            viewModel.saveCapturedImage(bitmap)
-        },
-        onImageSelected = { uri ->
-            viewModel.saveSelectedImageUri(uri)
-        }
-    )
+    imageHandler = remember {
+        ImageHandler(
+            onImageCaptured = { bitmap ->
+                imageHandler.startCrop(context, bitmap.toUri(context))
+            },
+            onImageSelected = { uri ->
+                imageHandler.startCrop(context, uri)
+            },
+            onImageCropped = { croppedUri ->
+                viewModel.saveCapturedImage(croppedUri)
+            },
+            onCropError = { error ->
+                cropErrorToast = error
+            }
+        )
+    }
 
     if (requestPermission) {
         imageHandler.RequestCameraPermission(
@@ -104,7 +112,7 @@ fun LoginScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .padding(horizontal = 24.dp, vertical = 48.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -120,12 +128,35 @@ fun LoginScreen(
                 ),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = userName.getInitials(),
-                style = Typography.titleMedium.copy(
-                    fontSize = 60.sp,
+            if (imageUri != null) {
+                Image(
+                    painter = rememberAsyncImagePainter(
+                        model = imageUri,
+                        onLoading = {
+                            isLoading = true
+                        },
+                        onError = {
+                            isLoading = false
+                        },
+                        onSuccess = {
+                            isLoading = false
+                        }
+                    ),
+                    contentDescription = "Imagem de perfil",
+                    modifier = Modifier
+                        .size(180.dp)
+                        .clip(CircleShape)
                 )
-            )
+            } else if (isLoading) {
+                CircularProgressIndicator(modifier = Modifier.size(60.dp), strokeWidth = 5.dp, color = Color.White)
+            } else {
+                Text(
+                    text = userName.getInitials(),
+                    style = Typography.titleMedium.copy(
+                        fontSize = 60.sp,
+                    )
+                )
+            }
 
             Box(
                 modifier = Modifier
@@ -225,12 +256,12 @@ fun LoginScreen(
                 ) {
                     Icon(
                         painter = painterResource(eyeIcon),
-                        contentDescription = "Password Visibility"
+                        contentDescription = "Password Visibility",
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
             }
         )
-
 
         Box(
             modifier = Modifier
@@ -270,8 +301,13 @@ fun LoginScreen(
             }
         }
         if (permissionDeniedToast) {
-            Toast.makeText(LocalContext.current, "Permissão Negada", Toast.LENGTH_SHORT ).show()
+            Toast.makeText(LocalContext.current, "Permissão Negada", Toast.LENGTH_SHORT).show()
             permissionDeniedToast = !permissionDeniedToast
+        }
+        if (cropErrorToast) {
+            Toast.makeText(LocalContext.current, "Erro ao cortar a imagem", Toast.LENGTH_SHORT)
+                .show()
+            cropErrorToast = !cropErrorToast
         }
     }
     if (showBottomSheet) {
