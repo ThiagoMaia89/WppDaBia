@@ -7,8 +7,9 @@ import androidx.lifecycle.ViewModel
 import com.example.wppdabia.network.Remote
 import com.example.wppdabia.network.RemoteImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class LoginViewModel : ViewModel() {
+class LoginViewModel @Inject constructor() : ViewModel() {
     private var _capturedImageUri = MutableLiveData<Uri?>()
     val capturedImageUri: LiveData<Uri?> = _capturedImageUri
 

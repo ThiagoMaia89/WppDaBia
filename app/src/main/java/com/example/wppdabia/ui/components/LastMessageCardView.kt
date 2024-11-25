@@ -26,14 +26,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import com.example.wppdabia.data.CardViewData
+import com.example.wppdabia.data.LastMessageCardViewData
 import com.example.wppdabia.ui.extensions.getInitials
 import com.example.wppdabia.ui.theme.Typography
 import com.example.wppdabia.ui.theme.WppDaBiaTheme
 
 @Composable
-fun CardView(cardViewData: CardViewData) {
-    val lastMessage = remember { mutableStateOf(cardViewData.lastMessage) }
+fun LastMessageCardView(lastMessageCardViewData: LastMessageCardViewData) {
+    val lastMessage = remember { mutableStateOf(lastMessageCardViewData.lastMessage) }
     Row(
         modifier = Modifier
             .wrapContentHeight()
@@ -57,15 +57,15 @@ fun CardView(cardViewData: CardViewData) {
             ),
             contentAlignment = Alignment.Center
         ) {
-                if (cardViewData.imageUrl != null) {
+                if (lastMessageCardViewData.imageUrl != null) {
                     Image(
-                        painter = rememberAsyncImagePainter(cardViewData.imageUrl),
+                        painter = rememberAsyncImagePainter(lastMessageCardViewData.imageUrl),
                         contentDescription = null,
                         modifier = Modifier.fillMaxSize()
                     )
                 } else {
                     Text(
-                        text = cardViewData.senderName.getInitials(),
+                        text = lastMessageCardViewData.senderName.getInitials(),
                         style = Typography.titleMedium.copy(
                             fontSize = 12.sp,
                         )
@@ -79,7 +79,7 @@ fun CardView(cardViewData: CardViewData) {
         ) {
             Text(
                 modifier = Modifier.wrapContentHeight(),
-                text = cardViewData.senderName,
+                text = lastMessageCardViewData.senderName,
                 style = Typography.bodySmall.merge(
                     fontSize = 12.sp
                 )
@@ -97,7 +97,7 @@ fun CardView(cardViewData: CardViewData) {
             contentAlignment = Alignment.CenterEnd
         ) {
             Text(
-                text = cardViewData.timeStamp,
+                text = lastMessageCardViewData.timeStamp,
                 style = Typography.bodySmall.copy(
                     fontSize = 8.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -112,8 +112,8 @@ fun CardView(cardViewData: CardViewData) {
 private fun HomeMessageCardViewPreview() {
     WppDaBiaTheme {
         Column(modifier = Modifier.wrapContentHeight()) {
-            CardView(
-                CardViewData(
+            LastMessageCardView(
+                LastMessageCardViewData(
                     imageUrl = null,
                     senderName = "Thiago Maia",
                     lastMessage = "Oi filhota, tudo bem?",

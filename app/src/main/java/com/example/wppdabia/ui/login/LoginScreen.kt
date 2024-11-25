@@ -48,22 +48,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.wppdabia.R
 import com.example.wppdabia.domain.utils.ImageHandler
+import com.example.wppdabia.ui.components.AppBaseContent
 import com.example.wppdabia.ui.components.ImagePickerBottomSheet
 import com.example.wppdabia.ui.extensions.getInitials
 import com.example.wppdabia.ui.extensions.toUri
+import com.example.wppdabia.ui.navigation.Screen
 import com.example.wppdabia.ui.theme.Typography
 import com.example.wppdabia.ui.theme.WppDaBiaTheme
 import kotlinx.coroutines.launch
 
 @Composable
-fun LoginScreen() {
-
-    val viewModel: LoginViewModel = viewModel()
+fun LoginScreen(navController: NavController, viewModel: LoginViewModel) {
     val context = LocalContext.current
     var email by remember { mutableStateOf("") }
     var userName by remember { mutableStateOf("") }
@@ -115,8 +115,7 @@ fun LoginScreen() {
 
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 24.dp, vertical = 48.dp),
+            .fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -298,11 +297,7 @@ fun LoginScreen() {
                                 profileImageUri = imageUri,
                                 onSuccess = {
                                     registerLoading = false
-                                    Toast.makeText(
-                                        context,
-                                        "Cadastro realizado com sucesso!",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                    navController.navigate(Screen.Home.route)
                                 },
                                 onError = {
                                     registerLoading = false
@@ -352,7 +347,7 @@ fun LoginScreen() {
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
-    WppDaBiaTheme {
-        LoginScreen()
+    AppBaseContent {
+        LoginScreen(rememberNavController(), LoginViewModel())
     }
 }

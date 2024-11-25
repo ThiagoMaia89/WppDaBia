@@ -25,18 +25,13 @@
         android:theme="@style/Theme.WppDaBia"
         tools:targetApi="31">
         <activity
-            android:name=".ui.login.LoginActivity"
+            android:name=".ui.activity.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.WppDaBia">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name=".ui.home.HomeActivity"
-            android:exported="false"
-            android:theme="@style/Theme.WppDaBia">
         </activity>
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
