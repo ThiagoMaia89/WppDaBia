@@ -1,5 +1,7 @@
 [versions]
 agp = "8.7.2"
+hiltAndroidCompiler = "2.51.1"
+hiltAndroidGradlePlugin = "2.44"
 kotlin = "2.0.0"
 coreKtx = "1.10.1"
 junit = "4.13.2"
@@ -13,9 +15,14 @@ coil = "2.2.2"
 firebaseBom = "33.6.0"
 runtimeLivedata = "1.7.5"
 uCrop = "2.2.6"
+navigationCompose = "2.8.4"
+hiltAndroid = "2.52"
+hiltNavigationCompose = "1.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }
+hilt-android-gradle-plugin = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hiltAndroidGradlePlugin" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -37,6 +44,9 @@ firebase-auth = { group = "com.google.firebase", name = "firebase-auth-ktx"}
 firebase-database = { group = "com.google.firebase", name = "firebase-database-ktx"}
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
 crop = { group = "com.github.yalantis", name = "ucrop", version.ref = "uCrop" }
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hiltAndroid" }
+androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

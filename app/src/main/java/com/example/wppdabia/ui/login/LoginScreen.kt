@@ -4,7 +4,6 @@ import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -49,6 +48,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.wppdabia.R
 import com.example.wppdabia.domain.utils.ImageHandler
@@ -60,9 +61,9 @@ import com.example.wppdabia.ui.theme.WppDaBiaTheme
 import kotlinx.coroutines.launch
 
 @Composable
-fun LoginScreen(
-    viewModel: LoginViewModel
-) {
+fun LoginScreen() {
+
+    val viewModel: LoginViewModel = viewModel()
     val context = LocalContext.current
     var email by remember { mutableStateOf("") }
     var userName by remember { mutableStateOf("") }
@@ -70,7 +71,8 @@ fun LoginScreen(
     var passwordVisible by remember { mutableStateOf(false) }
     var showBottomSheet by remember { mutableStateOf(false) }
     val imageUri = viewModel.capturedImageUri.observeAsState().value
-    var isLoading by remember { mutableStateOf(false) }
+    var imageLoading by remember { mutableStateOf(false) }
+    var registerLoading by remember { mutableStateOf(false) }
     lateinit var imageHandler: ImageHandler
 
     var requestPermission by remember { mutableStateOf(false) }
@@ -135,13 +137,13 @@ fun LoginScreen(
                     painter = rememberAsyncImagePainter(
                         model = imageUri,
                         onLoading = {
-                            isLoading = true
+                            imageLoading = true
                         },
                         onError = {
-                            isLoading = false
+                            imageLoading = false
                         },
                         onSuccess = {
-                            isLoading = false
+                            imageLoading = false
                         }
                     ),
                     contentDescription = "Imagem de perfil",
@@ -149,8 +151,12 @@ fun LoginScreen(
                         .size(180.dp)
                         .clip(CircleShape)
                 )
-            } else if (isLoading) {
-                CircularProgressIndicator(modifier = Modifier.size(60.dp), strokeWidth = 5.dp, color = Color.White)
+            } else if (imageLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(60.dp),
+                    strokeWidth = 5.dp,
+                    color = Color.White
+                )
             } else {
                 Text(
                     text = userName.getInitials(),
@@ -284,12 +290,14 @@ fun LoginScreen(
                 onClick = {
                     if (userName.isNotBlank() && email.isNotBlank() && password.isNotBlank()) {
                         viewModel.viewModelScope.launch {
+                            registerLoading = true
                             viewModel.registerUser(
                                 name = userName,
                                 email = email,
                                 password = password,
                                 profileImageUri = imageUri,
                                 onSuccess = {
+                                    registerLoading = false
                                     Toast.makeText(
                                         context,
                                         "Cadastro realizado com sucesso!",
@@ -297,6 +305,7 @@ fun LoginScreen(
                                     ).show()
                                 },
                                 onError = {
+                                    registerLoading = false
                                     Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
                                 }
                             )
@@ -304,11 +313,18 @@ fun LoginScreen(
                     }
                 }
             ) {
-                Text(
-                    modifier = Modifier.wrapContentWidth(),
-                    text = "Cadastrar",
-                    textAlign = TextAlign.Start
+                if (registerLoading) CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    strokeWidth = 3.dp,
+                    color = Color.White
                 )
+                else {
+                    Text(
+                        modifier = Modifier.wrapContentWidth(),
+                        text = "Cadastrar",
+                        textAlign = TextAlign.Start
+                    )
+                }
             }
         }
         if (permissionDeniedToast) {
@@ -337,8 +353,6 @@ fun LoginScreen(
 @Composable
 fun LoginScreenPreview() {
     WppDaBiaTheme {
-        LoginScreen(
-            viewModel = LoginViewModel()
-        )
+        LoginScreen()
     }
 }

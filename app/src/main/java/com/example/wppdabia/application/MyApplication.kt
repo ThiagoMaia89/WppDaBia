@@ -2,7 +2,9 @@ package com.example.wppdabia.application
 
 import android.app.Application
 import com.google.firebase.FirebaseApp
+import dagger.hilt.android.HiltAndroidApp
 
+@HiltAndroidApp
 open class MyApplication: Application() {
 
     override fun onCreate() {

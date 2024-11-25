@@ -11,6 +11,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.wppdabia.data.CardViewData
+import com.example.wppdabia.ui.components.CardView
 import com.example.wppdabia.ui.theme.WppDaBiaTheme
 
 class HomeActivity : ComponentActivity() {
@@ -19,14 +21,24 @@ class HomeActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             WppDaBiaTheme {
-                Box(modifier = Modifier.fillMaxSize()
-                ) {
-                    Greeting(
-                        name = "Android",
-                    )
-                }
+                HomeScreen()
             }
         }
+    }
+}
+
+
+@Composable
+fun HomeScreen() {
+    Box(modifier = Modifier.fillMaxSize()) {
+        CardView(
+            CardViewData(
+                senderName = "Thiago",
+                lastMessage = "Olá!",
+                timeStamp = "22:17",
+                imageUrl = null
+            )
+        )
     }
 }
 
