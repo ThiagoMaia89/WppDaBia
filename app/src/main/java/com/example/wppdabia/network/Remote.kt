@@ -1,14 +1,12 @@
 package com.example.wppdabia.network
 
 import android.net.Uri
+import com.example.wppdabia.data.UserData
 
 interface Remote {
 
     suspend fun registerUser(
-        name: String,
-        email: String,
-        password: String,
-        profileImageUri: Uri?,
+        userData: UserData,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     )

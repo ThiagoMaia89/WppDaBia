@@ -1,5 +1,6 @@
 package com.example.wppdabia.ui.contacts
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,6 +24,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -42,6 +44,11 @@ fun ContactsScreen(navController: NavController, viewModel: ContactsViewModel) {
     val filteredContacts = contacts?.filter {
         it.name.contains(searchQuery, ignoreCase = true) ||
                 it.email.contains(searchQuery, ignoreCase = true)
+    }
+
+    if (viewModel.errorMessage.observeAsState().value != null) {
+        Toast.makeText(LocalContext.current, viewModel.errorMessage.value, Toast.LENGTH_SHORT).show()
+        viewModel.errorMessage.value = null
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -89,7 +96,10 @@ fun ContactsScreen(navController: NavController, viewModel: ContactsViewModel) {
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    AppBaseContent {
+    AppBaseContent(
+        title = "Contatos",
+        onBackClick = {}
+    ) {
         ContactsScreen(rememberNavController(), ContactsViewModel())
     }
 }

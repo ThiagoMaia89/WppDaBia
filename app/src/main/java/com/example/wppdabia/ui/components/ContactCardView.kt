@@ -110,6 +110,7 @@ private fun ContactCardViewPreview() {
         Column(modifier = Modifier.wrapContentHeight()) {
             ContactCardView(
                 contactData = ContactData(
+                    id = "1",
                     name = "Thiago Maia",
                     email = "james.a.garfield@examplepetstore.com",
                     profileImageUrl = null

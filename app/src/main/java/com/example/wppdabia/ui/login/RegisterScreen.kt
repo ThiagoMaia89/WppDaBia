@@ -52,6 +52,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.wppdabia.R
+import com.example.wppdabia.data.UserData
+import com.example.wppdabia.data.data_store.PreferencesManager
 import com.example.wppdabia.domain.utils.ImageHandler
 import com.example.wppdabia.ui.components.AppBaseContent
 import com.example.wppdabia.ui.components.ImagePickerBottomSheet
@@ -59,11 +61,10 @@ import com.example.wppdabia.ui.extensions.getInitials
 import com.example.wppdabia.ui.extensions.toUri
 import com.example.wppdabia.ui.navigation.Screen
 import com.example.wppdabia.ui.theme.Typography
-import com.example.wppdabia.ui.theme.WppDaBiaTheme
 import kotlinx.coroutines.launch
 
 @Composable
-fun LoginScreen(navController: NavController, viewModel: LoginViewModel) {
+fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
     val context = LocalContext.current
     var email by remember { mutableStateOf("") }
     var userName by remember { mutableStateOf("") }
@@ -291,10 +292,13 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel) {
                         viewModel.viewModelScope.launch {
                             registerLoading = true
                             viewModel.registerUser(
-                                name = userName,
-                                email = email,
-                                password = password,
-                                profileImageUri = imageUri,
+                                userData = UserData(
+                                    name = userName,
+                                    email = email,
+                                    password = password,
+                                    profileImageUrl = imageUri
+
+                                ),
                                 onSuccess = {
                                     registerLoading = false
                                     navController.navigate(Screen.Home.route)
@@ -346,8 +350,11 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel) {
 
 @Preview(showBackground = true)
 @Composable
-fun LoginScreenPreview() {
-    AppBaseContent {
-        LoginScreen(rememberNavController(), LoginViewModel())
+fun RegisterScreenPreview() {
+    AppBaseContent(
+        title = "Cadastro",
+        onBackClick = {}
+    ) {
+        RegisterScreen(rememberNavController(), RegisterViewModel(PreferencesManager(LocalContext.current)))
     }
 }

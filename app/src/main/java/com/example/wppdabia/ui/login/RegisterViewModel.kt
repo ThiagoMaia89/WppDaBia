@@ -4,12 +4,18 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.wppdabia.data.UserData
+import com.example.wppdabia.data.data_store.PreferencesManager
 import com.example.wppdabia.network.Remote
 import com.example.wppdabia.network.RemoteImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class LoginViewModel @Inject constructor() : ViewModel() {
+@HiltViewModel
+class RegisterViewModel @Inject constructor(private val preferencesManager: PreferencesManager) :
+    ViewModel() {
     private var _capturedImageUri = MutableLiveData<Uri?>()
     val capturedImageUri: LiveData<Uri?> = _capturedImageUri
 
@@ -20,20 +26,17 @@ class LoginViewModel @Inject constructor() : ViewModel() {
     }
 
     suspend fun registerUser(
-        name: String,
-        email: String,
-        password: String,
-        profileImageUri: Uri?,
+        userData: UserData,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
         remote.registerUser(
-            name = name,
-            email = email,
-            password = password,
-            profileImageUri = profileImageUri,
+            userData = userData,
             onSuccess = {
                 onSuccess.invoke()
+                viewModelScope.launch {
+                    preferencesManager.saveIsRegistered(true)
+                }
             },
             onError = {
                 onError.invoke(it)

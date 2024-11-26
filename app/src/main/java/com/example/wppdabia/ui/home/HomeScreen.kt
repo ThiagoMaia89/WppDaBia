@@ -47,7 +47,7 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
             containerColor = MaterialTheme.colorScheme.primary,
             shape = RoundedCornerShape(180.dp),
             onClick = {
-                //navController.navigate(Screen.Contacts.route)
+                navController.navigate(Screen.Contacts.route)
             }
         ) {
             Icon(
@@ -63,7 +63,10 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    AppBaseContent {
+    AppBaseContent(
+        title = "Home",
+        onBackClick = {}
+    ) {
         HomeScreen(rememberNavController(), HomeViewModel())
     }
 }
