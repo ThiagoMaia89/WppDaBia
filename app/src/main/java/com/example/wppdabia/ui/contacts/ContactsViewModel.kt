@@ -5,18 +5,24 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.wppdabia.data.ContactData
+import com.example.wppdabia.network.Remote
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class ContactsViewModel @Inject constructor() : ViewModel() {
+@HiltViewModel
+class ContactsViewModel @Inject constructor(private val remote: Remote) : ViewModel() {
     private val _contacts = MutableLiveData<List<ContactData>>()
     val contacts: LiveData<List<ContactData>> = _contacts
 
-    private val database = FirebaseDatabase.getInstance().reference
+    private val _contactsLoading = MutableStateFlow(false)
+    val contactsLoading: StateFlow<Boolean> = _contactsLoading
 
     var errorMessage = MutableLiveData<String>()
 
@@ -25,21 +31,18 @@ class ContactsViewModel @Inject constructor() : ViewModel() {
     }
 
     private fun getContacts() {
+        _contactsLoading.value = true
         viewModelScope.launch {
-            database.child("users").addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val userList = mutableListOf<ContactData>()
-                    for (contactSnapshot in snapshot.children) {
-                        val contact = contactSnapshot.getValue(ContactData::class.java)?.copy(id = contactSnapshot.key ?: "")
-                        contact?.let { userList.add(it) }
-                    }
-                    _contacts.value = userList
+            remote.getAllContacts(
+                onSuccess = { contactsList ->
+                    _contactsLoading.value = false
+                    _contacts.value = contactsList
+                },
+                onError = { message ->
+                    _contactsLoading.value = false
+                    errorMessage.value = message
                 }
-
-                override fun onCancelled(error: DatabaseError) {
-                    errorMessage.value = error.message
-                }
-            })
+            )
         }
     }
 }

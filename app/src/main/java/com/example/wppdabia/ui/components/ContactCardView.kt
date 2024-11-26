@@ -19,8 +19,6 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.wppdabia.data.ContactData
-import com.example.wppdabia.data.LastMessageCardViewData
 import com.example.wppdabia.ui.extensions.getInitials
 import com.example.wppdabia.ui.theme.Typography
 import com.example.wppdabia.ui.theme.WppDaBiaTheme
@@ -76,6 +73,7 @@ fun ContactCardView(
                     text = contactData.name.getInitials(),
                     style = Typography.titleMedium.copy(
                         fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 )
             }
@@ -89,14 +87,15 @@ fun ContactCardView(
                 modifier = Modifier.wrapContentHeight(),
                 text = contactData.name,
                 style = Typography.bodySmall.merge(
-                    fontSize = 12.sp
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.primary
                 )
             )
             Text(
                 text = contactData.email,
                 style = Typography.bodySmall.copy(
                     fontSize = 10.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
                 )
             )
         }

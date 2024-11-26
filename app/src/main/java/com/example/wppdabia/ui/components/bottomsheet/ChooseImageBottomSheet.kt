@@ -1,4 +1,4 @@
-package com.example.wppdabia.ui.components
+package com.example.wppdabia.ui.components.bottomsheet
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -14,12 +14,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.wppdabia.R
 import com.example.wppdabia.ui.theme.WppDaBiaTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ImagePickerBottomSheet(
+fun ChooseImageBottomSheet(
     onCameraClick: () -> Unit,
     onGalleryClick: () -> Unit,
     onDismiss: () -> Unit
@@ -29,7 +30,7 @@ fun ImagePickerBottomSheet(
         onDismissRequest = { onDismiss() },
         dragHandle = { BottomSheetDefaults.DragHandle(color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))}
     ) {
-        ImagePickerBottomSheetContent(
+        ChooseImageBottomSheetContent(
             onCameraClick = onCameraClick,
             onGalleryClick = onGalleryClick
         )
@@ -37,7 +38,7 @@ fun ImagePickerBottomSheet(
 }
 
 @Composable
-private fun ImagePickerBottomSheetContent(
+private fun ChooseImageBottomSheetContent(
     onCameraClick: () -> Unit,
     onGalleryClick: () -> Unit
 ) {
@@ -48,7 +49,7 @@ private fun ImagePickerBottomSheetContent(
     ) {
         Text(
             text = "Escolha uma opção",
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.primary, fontSize = 20.sp)
         )
         Spacer(modifier = Modifier.height(16.dp))
         BottomSheetButton(
@@ -71,9 +72,9 @@ private fun ImagePickerBottomSheetContent(
 
 @Composable
 @Preview(showBackground = true)
-private fun ImagePickerBottomSheetPreview() {
+private fun ChooseImageBottomSheetPreview() {
     WppDaBiaTheme {
-        ImagePickerBottomSheetContent(
+        ChooseImageBottomSheetContent(
             onCameraClick = {},
             onGalleryClick = {}
         )

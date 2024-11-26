@@ -17,6 +17,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.wppdabia.R
 import com.example.wppdabia.ui.theme.WppDaBiaTheme
 
@@ -28,15 +29,15 @@ fun NoMessageAlert() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(
-            modifier = Modifier.size(100.dp),
+            modifier = Modifier.size(50.dp),
             painter = painterResource(R.drawable.ic_no_message),
-            contentDescription = "Selecionar foto",
+            contentDescription = "Sem mensagens",
             tint = MaterialTheme.colorScheme.primary
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         Text(
-            text = "Você não possui nenhuma mensagem. \nAdicione um contato e comece a conversar!",
-            style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.primary),
+            text = "Suas mensagens aparecerão aqui!",
+            style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.primary, fontSize = 16.sp),
             textAlign = TextAlign.Center
         )
     }

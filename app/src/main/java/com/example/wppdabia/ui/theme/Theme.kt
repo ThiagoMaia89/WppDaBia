@@ -13,13 +13,13 @@ import androidx.compose.ui.platform.LocalContext
 private val DarkColorScheme = darkColorScheme(
     primary = Pink80,
     secondary = PurpleGrey80,
-    tertiary = Purple80
+    tertiary = Pink40
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = Pink40,
     secondary = PurpleGrey40,
-    tertiary = Purple40
+    tertiary = Pink80
 )
 
 @Composable
@@ -31,8 +31,8 @@ fun WppDaBiaTheme(
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context).copy(primary = Pink80)
-            else dynamicLightColorScheme(context).copy(primary = Pink40)
+            if (darkTheme) dynamicDarkColorScheme(context).copy(primary = Pink80, tertiary = Pink40)
+            else dynamicLightColorScheme(context).copy(primary = Pink40, tertiary = Pink80)
         }
 
         darkTheme -> DarkColorScheme

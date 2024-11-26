@@ -1,25 +1,28 @@
-package com.example.wppdabia.network
+package com.example.wppdabia.ui.mock
 
-import android.net.Uri
 import com.example.wppdabia.data.ContactData
 import com.example.wppdabia.data.UserData
+import com.example.wppdabia.network.Remote
 
-interface Remote {
-
-    suspend fun registerUser(
+val fakeRemote = object : Remote {
+    override suspend fun registerUser(
         userData: UserData,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
-    )
+    ) {
+        onSuccess()
+    }
 
-    fun loginUser(
+    override fun loginUser(
         userData: UserData,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
-    )
+    ) {
+        onSuccess()
+    }
 
-    suspend fun getAllContacts(
+    override suspend fun getAllContacts(
         onSuccess: (List<ContactData>) -> Unit,
         onError: (String) -> Unit
-    )
+    ) { }
 }

@@ -53,7 +53,7 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
             Icon(
                 painter = painterResource(R.drawable.ic_add_user),
                 contentDescription = "Selecionar foto",
-                tint = MaterialTheme.colorScheme.inversePrimary
+                tint = MaterialTheme.colorScheme.onPrimary
             )
         }
 
