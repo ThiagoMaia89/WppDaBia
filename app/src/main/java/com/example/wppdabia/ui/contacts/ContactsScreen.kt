@@ -60,7 +60,7 @@ fun ContactsScreen(navController: NavController, viewModel: ContactsViewModel) {
         viewModel.errorMessage.value = null
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize().padding(24.dp)) {
         OutlinedTextField(
             value = searchQuery,
             onValueChange = { searchQuery = it },

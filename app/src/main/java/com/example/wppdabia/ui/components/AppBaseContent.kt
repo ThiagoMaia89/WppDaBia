@@ -2,24 +2,21 @@ package com.example.wppdabia.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.example.wppdabia.ui.theme.WppDaBiaTheme
 
 @Composable
@@ -27,27 +24,24 @@ fun AppBaseContent(
     title: String,
     onBackClick: () -> Unit,
     actions: @Composable RowScope.() -> Unit = {},
-    content: @Composable (PaddingValues) -> Unit
+    content: @Composable () -> Unit
 ) {
     WppDaBiaTheme {
-        Scaffold(
-            topBar = {
-                WppDaBiaTopBar(
-                    title = title,
-                    onBackClick = onBackClick,
-                    actions = actions
-                )
-            }
-        ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = MaterialTheme.colorScheme.background),
+        ) {
+            WppDaBiaTopBar(
+                title = title,
+                onBackClick = onBackClick,
+                actions = actions
+            )
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(innerPadding)
-                    .padding(horizontal = 24.dp)
-                    .padding(top = 12.dp, bottom = 40.dp)
-                    .background(color = MaterialTheme.colorScheme.background)
             ) {
-                content(innerPadding)
+                content()
             }
         }
     }

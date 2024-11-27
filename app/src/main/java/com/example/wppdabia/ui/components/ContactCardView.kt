@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -36,69 +37,67 @@ fun ContactCardView(
     contactData: ContactData,
     onCardClick: () -> Unit
 ) {
-    Row(
-        modifier = modifier
-            .wrapContentHeight()
-            .fillMaxWidth()
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.primary,
-                shape = MaterialTheme.shapes.extraSmall
-            )
-            .padding(8.dp)
-            .clickable {
-                onCardClick.invoke()
-            },
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier
+    Column {
+        Row(
+            modifier = modifier
                 .wrapContentHeight()
-                .wrapContentWidth()
-                .size(24.dp)
-                .background(
-                    color = MaterialTheme.colorScheme.primary,
-                    shape = MaterialTheme.shapes.medium
-                ),
-            contentAlignment = Alignment.Center
+                .fillMaxWidth()
+                .padding(8.dp)
+                .clickable {
+                    onCardClick.invoke()
+                },
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            if (contactData.profileImageUrl != null) {
-                Image(
-                    painter = rememberAsyncImagePainter(contactData.profileImageUrl),
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize()
-                )
-            } else {
+            Box(
+                modifier = Modifier
+                    .wrapContentHeight()
+                    .wrapContentWidth()
+                    .size(24.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = MaterialTheme.shapes.medium
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                if (contactData.profileImageUrl != null) {
+                    Image(
+                        painter = rememberAsyncImagePainter(contactData.profileImageUrl),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    Text(
+                        text = contactData.name.getInitials(),
+                        style = Typography.titleMedium.copy(
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Column(
+                modifier = Modifier.wrapContentHeight(),
+                verticalArrangement = Arrangement.Center
+            ) {
                 Text(
-                    text = contactData.name.getInitials(),
-                    style = Typography.titleMedium.copy(
+                    modifier = Modifier.wrapContentHeight(),
+                    text = contactData.name,
+                    style = Typography.bodySmall.merge(
                         fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                )
+                Text(
+                    text = contactData.email,
+                    style = Typography.bodySmall.copy(
+                        fontSize = 10.sp,
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
                     )
                 )
             }
         }
-        Spacer(modifier = Modifier.width(8.dp))
-        Column(
-            modifier = Modifier.wrapContentHeight(),
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                modifier = Modifier.wrapContentHeight(),
-                text = contactData.name,
-                style = Typography.bodySmall.merge(
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            )
-            Text(
-                text = contactData.email,
-                style = Typography.bodySmall.copy(
-                    fontSize = 10.sp,
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
-                )
-            )
-        }
+        Spacer(modifier = Modifier.fillMaxWidth().height(1.dp).background(color = MaterialTheme.colorScheme.primary))
     }
 }
 

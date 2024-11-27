@@ -26,7 +26,7 @@ val fakeRemote = object : Remote {
         onError: (String) -> Unit
     ) { }
 
-    override suspend fun getCurrentUser(): UserData {
-        return UserData()
+    override suspend fun getCurrentUser(onSuccess: (UserData?) -> Unit, onError: (String) -> Unit) {
+        TODO("Not yet implemented")
     }
 }

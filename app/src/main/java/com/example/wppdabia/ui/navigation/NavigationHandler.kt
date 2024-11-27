@@ -1,10 +1,13 @@
 package com.example.wppdabia.ui.navigation
 
 import android.app.Activity
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -17,6 +20,8 @@ import com.example.wppdabia.ui.home.HomeScreen
 import com.example.wppdabia.ui.home.HomeViewModel
 import com.example.wppdabia.ui.login.RegisterScreen
 import com.example.wppdabia.ui.login.RegisterViewModel
+import com.example.wppdabia.ui.messages.MessageScreen
+import com.example.wppdabia.ui.messages.MessageViewModel
 
 @Composable
 fun NavigationHandler(preferencesManager: PreferencesManager) {
@@ -54,11 +59,21 @@ fun NavigationHandler(preferencesManager: PreferencesManager) {
                 ContactsScreen(navigationController, contactsViewModel)
             }
         }
+        composable(route = Screen.Messages.route) {
+            AppBaseContent(
+                title = Screen.Messages.title , // TODO: Pegar nome do contato
+                onBackClick = { navigationController.navigate(Screen.Home.route) },
+            ) {
+                val messageViewModel: MessageViewModel = hiltViewModel()
+                MessageScreen(navigationController, messageViewModel)
+            }
+        }
     }
 }
 
 sealed class Screen(val route: String, val title: String = "") {
     data object Register : Screen(route = "login_screen", title = "Cadastro")
-    data object Home : Screen("home_screen", title = "Wpp da Bia")
-    data object Contacts : Screen("contacts_screen", title = "Contatos")
+    data object Home : Screen(route = "home_screen", title = "Wpp da Bia")
+    data object Contacts : Screen(route = "contacts_screen", title = "Contatos")
+    data object Messages : Screen(route = "messages_screen", title = "Mensagem")
 }
