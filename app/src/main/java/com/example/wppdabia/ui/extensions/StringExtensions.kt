@@ -13,6 +13,10 @@ fun String.getInitials(): String {
     return initials.uppercase().take(2)
 }
 
+fun String.getFirstName(): String {
+    return this.split(" ").firstOrNull() ?: this
+}
+
 fun Bitmap.toUri(context: Context): Uri {
     val file = File(context.cacheDir, "temp_image.jpg")
     FileOutputStream(file).use { output ->

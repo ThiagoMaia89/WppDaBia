@@ -65,6 +65,9 @@ class RegisterViewModel @Inject constructor(private val preferencesManager: Pref
             onSuccess = {
                 _loginLoading.value = false
                 onSuccess.invoke()
+                viewModelScope.launch {
+                    preferencesManager.saveIsRegistered(true)
+                }
             },
             onError = {
                 _loginLoading.value = false

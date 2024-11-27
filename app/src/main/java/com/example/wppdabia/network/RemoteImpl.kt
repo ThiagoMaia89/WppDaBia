@@ -101,4 +101,25 @@ class RemoteImpl : Remote {
                 }
             })
     }
+
+    override suspend fun getCurrentUser(
+        onSuccess: (UserData?) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val currentUser = auth.currentUser
+
+        if (currentUser != null) {
+            val reference = database.getReference("users").child(currentUser.uid)
+            reference.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val user = snapshot.getValue(UserData::class.java)
+                    onSuccess(user)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    onError(error.message)
+                }
+            })
+        }
+    }
 }

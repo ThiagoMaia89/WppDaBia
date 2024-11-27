@@ -25,4 +25,8 @@ val fakeRemote = object : Remote {
         onSuccess: (List<ContactData>) -> Unit,
         onError: (String) -> Unit
     ) { }
+
+    override suspend fun getCurrentUser(): UserData {
+        return UserData()
+    }
 }
