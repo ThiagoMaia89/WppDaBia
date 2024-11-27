@@ -19,8 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class RegisterViewModel @Inject constructor(private val preferencesManager: PreferencesManager, private val remote: Remote) :
     ViewModel() {
-    private var _capturedImageUri = MutableLiveData<Uri?>()
-    val capturedImageUri: LiveData<Uri?> = _capturedImageUri
+    private var _capturedImageUri = MutableLiveData<String?>()
+    val capturedImageUri: LiveData<String?> = _capturedImageUri
 
     private val _loginLoading = MutableStateFlow(false)
     val loginLoading: StateFlow<Boolean> = _loginLoading
@@ -29,7 +29,7 @@ class RegisterViewModel @Inject constructor(private val preferencesManager: Pref
     val registerLoading: StateFlow<Boolean> = _registerLoading
 
     fun saveCapturedImage(uri: Uri) {
-        _capturedImageUri.value = uri
+        _capturedImageUri.value = uri.toString()
     }
 
     suspend fun registerUser(

@@ -114,10 +114,8 @@ fun ContactsScreen(navController: NavController, viewModel: ContactsViewModel) {
             LazyColumn {
                 val listToShow: List<ContactData>? =
                     if (searchQuery.isEmpty()) contacts else filteredContacts
-                itemsIndexed(listToShow ?: emptyList()) { index, contact ->
-                    val paddingBottom = if (index != contacts?.lastIndex) 8.dp else 0.dp
+                itemsIndexed(listToShow ?: emptyList()) { _, contact ->
                     ContactCardView(
-                        modifier = Modifier.padding(bottom = paddingBottom),
                         contactData = contact,
                         onCardClick = {
                             navController.navigate(Screen.Home.route)

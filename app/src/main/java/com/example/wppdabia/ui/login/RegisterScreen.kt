@@ -58,12 +58,9 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.wppdabia.R
-import com.example.wppdabia.data.ContactData
 import com.example.wppdabia.data.UserData
 import com.example.wppdabia.data.data_store.PreferencesManager
 import com.example.wppdabia.domain.utils.ImageHandler
-import com.example.wppdabia.network.Remote
-import com.example.wppdabia.network.RemoteImpl
 import com.example.wppdabia.ui.components.AppBaseContent
 import com.example.wppdabia.ui.components.bottomsheet.ChooseImageBottomSheet
 import com.example.wppdabia.ui.components.bottomsheet.LoginBottomSheet
@@ -83,7 +80,7 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
     var passwordVisible by remember { mutableStateOf(false) }
     var showPhotoBottomSheet by remember { mutableStateOf(false) }
     var showLoginBottomSheet by remember { mutableStateOf(false) }
-    val imageUri = viewModel.capturedImageUri.observeAsState().value
+    val imageUrl = viewModel.capturedImageUri.observeAsState().value
     var imageLoading by remember { mutableStateOf(false) }
     val registerLoading = viewModel.registerLoading.collectAsState().value
     lateinit var imageHandler: ImageHandler
@@ -145,10 +142,10 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
                 ),
             contentAlignment = Alignment.Center
         ) {
-            if (imageUri != null) {
+            if (imageUrl != null) {
                 Image(
                     painter = rememberAsyncImagePainter(
-                        model = imageUri,
+                        model = imageUrl,
                         onLoading = {
                             imageLoading = true
                         },
@@ -328,7 +325,7 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
                                     name = userName,
                                     email = email,
                                     password = password,
-                                    profileImageUrl = imageUri
+                                    profileImageUrl = imageUrl
 
                                 ),
                                 onSuccess = {

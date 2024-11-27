@@ -1,5 +1,6 @@
 package com.example.wppdabia.network
 
+import androidx.core.net.toUri
 import com.example.wppdabia.data.ContactData
 import com.example.wppdabia.data.UserData
 import com.google.firebase.auth.FirebaseAuth
@@ -26,7 +27,7 @@ class RemoteImpl : Remote {
 
                 if (userData.profileImageUrl != null) {
                     val storageRef = storage.reference.child("profile_images/$userId.jpg")
-                    storageRef.putFile(userData.profileImageUrl)
+                    storageRef.putFile(userData.profileImageUrl.toUri())
                         .addOnSuccessListener {
                             storageRef.downloadUrl.addOnSuccessListener { downloadUri ->
                                 val user = mapOf(
