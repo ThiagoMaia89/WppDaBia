@@ -118,7 +118,7 @@ fun ContactsScreen(navController: NavController, viewModel: ContactsViewModel) {
                     ContactCardView(
                         contactData = contact,
                         onCardClick = {
-                            navController.navigate(Screen.Home.route)
+                            viewModel.navigateToChat(contact.id, navController)
                         }
                     )
                 }

@@ -14,19 +14,19 @@ import com.example.wppdabia.data.MessageData
 import com.example.wppdabia.ui.theme.WppDaBiaTheme
 
 @Composable
-fun MessageView(messageData: MessageData) {
+fun MessageView(messageData: MessageData, isSentByUser: Boolean) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
-        horizontalArrangement = if (messageData.isSentByUser) Arrangement.End else Arrangement.Start
+        horizontalArrangement = if (isSentByUser) Arrangement.End else Arrangement.Start
     ) {
-        val topStartShape = if (messageData.isSentByUser) 8.dp else 0.dp
-        val topEndShape = if (messageData.isSentByUser) 0.dp else 8.dp
+        val topStartShape = if (isSentByUser) 8.dp else 0.dp
+        val topEndShape = if (isSentByUser) 0.dp else 8.dp
         Column(
             modifier = Modifier
                 .background(
-                    if (messageData.isSentByUser) Color.LightGray else Color.White,
+                    if (isSentByUser) Color.LightGray else Color.White,
                     shape = RoundedCornerShape(topStart = topStartShape, topEnd = topEndShape, bottomStart = 8.dp, bottomEnd = 8.dp)
                 )
                 .padding(8.dp)
@@ -48,7 +48,8 @@ fun MessageViewPreview() {
                     content = "Oi filhota! Tudo bem?",
                     timestamp = "10:00 AM",
                     isSentByUser = true
-                )
+                ),
+                isSentByUser = true
             )
             MessageView(
                 messageData = MessageData(
@@ -56,7 +57,8 @@ fun MessageViewPreview() {
                     content = "Olá papai! Tudo bem sim!",
                     timestamp = "10:05 AM",
                     isSentByUser = false
-                )
+                ),
+                isSentByUser = false
             )
         }
     }

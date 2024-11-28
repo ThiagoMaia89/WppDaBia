@@ -4,8 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import com.example.wppdabia.data.ContactData
+import com.example.wppdabia.data.UserData
 import com.example.wppdabia.network.Remote
+import com.example.wppdabia.ui.extensions.getCurrentUser
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -24,10 +27,13 @@ class ContactsViewModel @Inject constructor(private val remote: Remote) : ViewMo
     private val _contactsLoading = MutableStateFlow(false)
     val contactsLoading: StateFlow<Boolean> = _contactsLoading
 
+    private val currentUser = MutableLiveData<UserData?>()
+
     var errorMessage = MutableLiveData<String>()
 
     init {
         getContacts()
+        viewModelScope.launch { getCurrentUser(currentUser, remote) }
     }
 
     private fun getContacts() {
@@ -44,5 +50,14 @@ class ContactsViewModel @Inject constructor(private val remote: Remote) : ViewMo
                 }
             )
         }
+    }
+
+    fun navigateToChat(contactId: String, navController: NavController) {
+        val chatId = generateChatId(currentUser.value?.uid ?: "", contactId)
+        navController.navigate("messages/$chatId/$contactId")
+    }
+
+    private fun generateChatId(user1: String, user2: String): String {
+        return if (user1 < user2) "$user1-$user2" else "$user2-$user1"
     }
 }

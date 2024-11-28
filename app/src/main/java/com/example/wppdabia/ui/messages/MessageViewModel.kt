@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.wppdabia.data.MessageData
 import com.example.wppdabia.data.UserData
 import com.example.wppdabia.network.Remote
+import com.example.wppdabia.ui.extensions.getCurrentUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,23 +22,42 @@ class MessageViewModel @Inject constructor(private val remote: Remote) : ViewMod
     private val _messages = MutableStateFlow<List<MessageData>>(emptyList())
     val messages: StateFlow<List<MessageData>> = _messages
 
-    fun sendMessage(content: String) {
+    private val currentUser = MutableLiveData<UserData?>()
+
+    private val _isSentByUser = MutableStateFlow(false)
+    val isSentByUser: StateFlow<Boolean> = _isSentByUser
+
+    init {
+        viewModelScope.launch { getCurrentUser(currentUser, remote) }
+    }
+
+    fun fetchMessages(chatId: String) {
+        viewModelScope.launch {
+            remote.fetchMessages(chatId = chatId).collect { fetchedMessages ->
+                _messages.value = fetchedMessages
+            }
+        }
+    }
+
+    fun sendMessage(chatId: String, contactId: String, content: String) {
+
+        val senderId = currentUser.value?.uid
+        _isSentByUser.value = senderId != contactId
+
         val newMessage = MessageData(
-            sender = "user_id", // Substitua pelo ID do remetente
+            sender = senderId ?: "",
             content = content,
             timestamp = getCurrentTimestamp(),
-            isSentByUser = true
+            isSentByUser = _isSentByUser.value
         )
-      //  repository.sendMessage(newMessage)
+        viewModelScope.launch { remote.sendMessage(chatId, newMessage) }
     }
 
     fun sendPhoto() {
-        // Lógica para enviar uma foto
-        // Você pode usar um seletor de imagens aqui ou capturar da câmera
+        //TODO: Enviar foto
     }
 
     private fun getCurrentTimestamp(): String {
-        // Gera o timestamp no formato desejado
         return SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
     }
 

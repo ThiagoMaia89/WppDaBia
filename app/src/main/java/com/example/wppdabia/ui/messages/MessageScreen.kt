@@ -1,16 +1,18 @@
 package com.example.wppdabia.ui.messages
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -19,6 +21,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,10 +43,16 @@ import com.example.wppdabia.ui.mock.fakeRemote
 @Composable
 fun MessageScreen(
     navController: NavController,
-    viewModel: MessageViewModel
+    viewModel: MessageViewModel,
+    chatId: String,
+    contactId: String,
 ) {
     val messages by viewModel.messages.collectAsState(initial = emptyList())
     var messageInput by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchMessages(chatId) // Passando o chatId para buscar mensagens específicas
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -52,7 +61,10 @@ fun MessageScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp)
-                    .background(color = MaterialTheme.colorScheme.tertiary, shape = RoundedCornerShape(16.dp))
+                    .background(
+                        color = MaterialTheme.colorScheme.tertiary,
+                        shape = RoundedCornerShape(16.dp)
+                    )
                     .padding(vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -88,7 +100,7 @@ fun MessageScreen(
                 IconButton(
                     onClick = {
                         if (messageInput.isNotBlank()) {
-                            viewModel.sendMessage(messageInput)
+                            viewModel.sendMessage(chatId = chatId, contactId = contactId, content = messageInput)
                             messageInput = ""
                         }
                     }
@@ -102,13 +114,23 @@ fun MessageScreen(
             }
         }
     ) { paddingValues ->
+        val listState = rememberLazyListState()
+
+        LaunchedEffect(messages) {
+            if (messages.isNotEmpty()) {
+                listState.animateScrollToItem(messages.size - 1)
+            }
+        }
+
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = paddingValues,
-            reverseLayout = true
+            state = listState,
+            verticalArrangement = Arrangement.Bottom,
+            contentPadding = paddingValues
         ) {
             items(messages) { message ->
-                MessageView(messageData = message)
+                val isSentByUser = message.sender != contactId
+                MessageView(messageData = message, isSentByUser = isSentByUser)
             }
         }
     }
@@ -121,6 +143,6 @@ fun MessageScreenPreview() {
         title = "Mensagem",
         onBackClick = {}
     ) {
-        MessageScreen(rememberNavController(), MessageViewModel(fakeRemote))
+        MessageScreen(rememberNavController(), MessageViewModel(fakeRemote), "", "")
     }
 }

@@ -9,9 +9,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.wppdabia.data.data_store.PreferencesManager
 import com.example.wppdabia.ui.components.AppBaseContent
 import com.example.wppdabia.ui.contacts.ContactsScreen
@@ -59,13 +61,26 @@ fun NavigationHandler(preferencesManager: PreferencesManager) {
                 ContactsScreen(navigationController, contactsViewModel)
             }
         }
-        composable(route = Screen.Messages.route) {
+        composable(
+            route = Screen.Messages.route,
+            arguments = listOf(
+                navArgument("chatId") { type = NavType.StringType },
+                navArgument("contactId") { type = NavType.StringType }
+            )
+        ) {
             AppBaseContent(
                 title = Screen.Messages.title , // TODO: Pegar nome do contato
                 onBackClick = { navigationController.navigate(Screen.Home.route) },
             ) {
+                val chatId = it.arguments?.getString("chatId") ?: ""
+                val contactId = it.arguments?.getString("contactId") ?: ""
                 val messageViewModel: MessageViewModel = hiltViewModel()
-                MessageScreen(navigationController, messageViewModel)
+
+                MessageScreen(
+                    navController = navigationController,
+                    viewModel = messageViewModel,
+                    chatId = chatId,
+                    contactId = contactId)
             }
         }
     }
@@ -75,5 +90,5 @@ sealed class Screen(val route: String, val title: String = "") {
     data object Register : Screen(route = "login_screen", title = "Cadastro")
     data object Home : Screen(route = "home_screen", title = "Wpp da Bia")
     data object Contacts : Screen(route = "contacts_screen", title = "Contatos")
-    data object Messages : Screen(route = "messages_screen", title = "Mensagem")
+    data object Messages : Screen(route = "messages/{chatId}/{contactId}", title = "Mensagem")
 }

@@ -2,6 +2,7 @@ package com.example.wppdabia.network
 
 import androidx.core.net.toUri
 import com.example.wppdabia.data.ContactData
+import com.example.wppdabia.data.MessageData
 import com.example.wppdabia.data.UserData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -9,6 +10,9 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 
 class RemoteImpl : Remote {
 
@@ -113,7 +117,7 @@ class RemoteImpl : Remote {
             val reference = database.getReference("users").child(currentUser.uid)
             reference.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    val user = snapshot.getValue(UserData::class.java)
+                    val user = snapshot.getValue(UserData::class.java)?.copy(uid = currentUser.uid)
                     onSuccess(user)
                 }
 
@@ -121,6 +125,31 @@ class RemoteImpl : Remote {
                     onError(error.message)
                 }
             })
+        }
+    }
+
+    override suspend fun sendMessage(chatId: String, message: MessageData) {
+        val chatRef = database.getReference("chats/$chatId")
+        chatRef.push().setValue(message)
+    }
+
+    override suspend fun fetchMessages(chatId: String): Flow<List<MessageData>> {
+        val chatRef = database.getReference("chats/$chatId")
+        return callbackFlow {
+            val listener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val messages = snapshot.children.mapNotNull {
+                        it.getValue(MessageData::class.java)
+                    }
+                    trySend(messages)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    close(error.toException())
+                }
+            }
+            chatRef.addValueEventListener(listener)
+            awaitClose { chatRef.removeEventListener(listener) }
         }
     }
 }
