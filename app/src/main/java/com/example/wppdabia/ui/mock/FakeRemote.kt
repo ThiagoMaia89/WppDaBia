@@ -39,4 +39,12 @@ val fakeRemote = object : Remote {
     override suspend fun fetchMessages(chatId: String): Flow<List<MessageData>> {
         TODO("Not yet implemented")
     }
+
+    override suspend fun getAllChats(
+        currentUserUid: String,
+        onSuccess: (List<ContactData>) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        TODO("Not yet implemented")
+    }
 }

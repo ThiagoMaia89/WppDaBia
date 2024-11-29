@@ -18,4 +18,6 @@ interface Remote {
     suspend fun sendMessage(chatId: String, message: MessageData)
 
     suspend fun fetchMessages(chatId: String): Flow<List<MessageData>>
+
+    suspend fun getAllChats(currentUserUid: String, onSuccess: (List<ContactData>) -> Unit, onError: (String) -> Unit)
 }

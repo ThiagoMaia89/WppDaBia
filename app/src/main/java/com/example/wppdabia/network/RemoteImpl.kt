@@ -152,4 +152,68 @@ class RemoteImpl : Remote {
             awaitClose { chatRef.removeEventListener(listener) }
         }
     }
+
+    override suspend fun getAllChats(
+        currentUserUid: String,
+        onSuccess: (List<ContactData>) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val databaseRef = database.reference.child("chats")
+
+        databaseRef.orderByKey()
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val chatPreviews = mutableListOf<ContactData>()
+
+                    for (chatSnapshot in snapshot.children) {
+                        val chatId = chatSnapshot.key ?: continue
+
+                        if (chatId.contains(currentUserUid)) {
+                            val lastMessageSnapshot = chatSnapshot.children.lastOrNull()
+                            val lastMessage = lastMessageSnapshot?.getValue(MessageData::class.java)
+
+                            if (lastMessage != null) {
+                                val contactUid = chatId.replace(currentUserUid, "").replace("-", "")
+
+                                database.reference.child("users").child(contactUid)
+                                    .addListenerForSingleValueEvent(object : ValueEventListener {
+                                        override fun onDataChange(contactSnapshot: DataSnapshot) {
+                                            val contactName = contactSnapshot.child("name").value as? String ?: "Desconhecido"
+                                            val contactImage = contactSnapshot.child("profileImageUrl").value as? String
+                                            val email = contactSnapshot.child("email").value as? String
+
+                                            chatPreviews.add(
+                                                ContactData(
+                                                    id = contactUid,
+                                                    name = contactName,
+                                                    email = email ?: "",
+                                                    profileImageUrl = contactImage ?: "",
+                                                    lastMessage = lastMessage.content,
+                                                    timestamp = lastMessage.timestamp,
+                                                    chatId = chatId
+                                                )
+                                            )
+
+                                            val sortedChatPreviews = chatPreviews.sortedByDescending {
+                                                it.timestamp
+                                            }
+                                            onSuccess(sortedChatPreviews)
+                                        }
+
+                                        override fun onCancelled(error: DatabaseError) {
+                                            onError(error.message)
+                                        }
+                                    })
+                            }
+                        }
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    onError(error.message)
+                }
+            })
+    }
+
+
 }

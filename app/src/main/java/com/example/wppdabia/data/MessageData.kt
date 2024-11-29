@@ -1,8 +1,10 @@
 package com.example.wppdabia.data
 
 data class MessageData(
-    val sender: String = "",
+    val id: String = "",
+    val sender: UserData = UserData(),
     val content: String = "",
     val timestamp: String = "",
-    val isSentByUser: Boolean = false
+    val isSentByUser: Boolean = false,
+    val lastMessage: String = ""
 )

@@ -80,7 +80,8 @@ fun NavigationHandler(preferencesManager: PreferencesManager) {
                     navController = navigationController,
                     viewModel = messageViewModel,
                     chatId = chatId,
-                    contactId = contactId)
+                    contactId = contactId
+                )
             }
         }
     }

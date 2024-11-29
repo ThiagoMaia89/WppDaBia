@@ -40,7 +40,6 @@ import com.example.wppdabia.data.ContactData
 import com.example.wppdabia.ui.components.AppBaseContent
 import com.example.wppdabia.ui.components.ContactCardView
 import com.example.wppdabia.ui.mock.fakeRemote
-import com.example.wppdabia.ui.navigation.Screen
 
 @Composable
 fun ContactsScreen(navController: NavController, viewModel: ContactsViewModel) {

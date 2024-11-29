@@ -39,16 +39,17 @@ class MessageViewModel @Inject constructor(private val remote: Remote) : ViewMod
         }
     }
 
-    fun sendMessage(chatId: String, contactId: String, content: String) {
+    fun sendMessage(chatId: String, contactId: String, content: String, lastMessage: String) {
 
         val senderId = currentUser.value?.uid
         _isSentByUser.value = senderId != contactId
 
         val newMessage = MessageData(
-            sender = senderId ?: "",
+            sender = currentUser.value ?: UserData(),
             content = content,
             timestamp = getCurrentTimestamp(),
-            isSentByUser = _isSentByUser.value
+            isSentByUser = _isSentByUser.value,
+            lastMessage = lastMessage
         )
         viewModelScope.launch { remote.sendMessage(chatId, newMessage) }
     }

@@ -51,7 +51,7 @@ fun MessageScreen(
     var messageInput by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
-        viewModel.fetchMessages(chatId) // Passando o chatId para buscar mensagens específicas
+        viewModel.fetchMessages(chatId)
     }
 
     Scaffold(
@@ -100,7 +100,7 @@ fun MessageScreen(
                 IconButton(
                     onClick = {
                         if (messageInput.isNotBlank()) {
-                            viewModel.sendMessage(chatId = chatId, contactId = contactId, content = messageInput)
+                            viewModel.sendMessage(chatId = chatId, contactId = contactId, content = messageInput, lastMessage = messageInput)
                             messageInput = ""
                         }
                     }
@@ -129,7 +129,7 @@ fun MessageScreen(
             contentPadding = paddingValues
         ) {
             items(messages) { message ->
-                val isSentByUser = message.sender != contactId
+                val isSentByUser = message.sender.uid != contactId
                 MessageView(messageData = message, isSentByUser = isSentByUser)
             }
         }
