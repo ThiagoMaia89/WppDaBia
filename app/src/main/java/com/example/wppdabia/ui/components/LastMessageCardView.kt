@@ -56,7 +56,7 @@ fun LastMessageCardView(contact: ContactData, onClick: () -> Unit) {
                     ),
                 contentAlignment = Alignment.Center
             ) {
-                if (contact.profileImageUrl != null) {
+                if (!contact.profileImageUrl.isNullOrEmpty()) {
                     Image(
                         modifier = Modifier.size(48.dp).clip(RoundedCornerShape(180.dp)),
                         painter = rememberAsyncImagePainter(contact.profileImageUrl),
@@ -68,6 +68,7 @@ fun LastMessageCardView(contact: ContactData, onClick: () -> Unit) {
                         text = contact.name.getInitials(),
                         style = Typography.titleMedium.copy(
                             fontSize = 18.sp,
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     )
                 }
