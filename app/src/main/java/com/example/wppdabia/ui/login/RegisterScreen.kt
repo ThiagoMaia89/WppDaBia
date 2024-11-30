@@ -327,7 +327,6 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel, o
                                     email = email,
                                     password = password,
                                     profileImageUrl = imageUrl
-
                                 ),
                                 onSuccess = {
                                     navController.navigate(Screen.Home.route)
