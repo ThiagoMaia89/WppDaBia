@@ -37,6 +37,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.wppdabia.data.ContactData
+import com.example.wppdabia.data.data_store.PreferencesManager
+import com.example.wppdabia.ui.SharedViewModel
 import com.example.wppdabia.ui.components.AppBaseContent
 import com.example.wppdabia.ui.components.ContactCardView
 import com.example.wppdabia.ui.mock.fakeRemote
@@ -131,7 +133,8 @@ fun ContactsScreen(navController: NavController, viewModel: ContactsViewModel) {
 fun ContactsScreenPreview() {
     AppBaseContent(
         title = "Contatos",
-        onBackClick = {}
+        onBackClick = {},
+        sharedViewModel = SharedViewModel(fakeRemote, PreferencesManager(LocalContext.current))
     ) {
         ContactsScreen(rememberNavController(), ContactsViewModel(fakeRemote))
     }

@@ -1,13 +1,14 @@
 package com.example.wppdabia.ui.navigation
 
 import android.app.Activity
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -15,6 +16,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.wppdabia.data.data_store.PreferencesManager
+import com.example.wppdabia.ui.SharedViewModel
 import com.example.wppdabia.ui.components.AppBaseContent
 import com.example.wppdabia.ui.contacts.ContactsScreen
 import com.example.wppdabia.ui.contacts.ContactsViewModel
@@ -30,6 +32,21 @@ fun NavigationHandler(preferencesManager: PreferencesManager) {
     val navigationController = rememberNavController()
     val isRegistered by preferencesManager.isRegistered().collectAsState(initial = false)
     val context = LocalContext.current
+    val sharedViewModel: SharedViewModel = hiltViewModel()
+    var loginMade by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit, loginMade) {
+        sharedViewModel.getCurrentUser()
+    }
+
+    LaunchedEffect(sharedViewModel.currentUser) {
+        if (sharedViewModel.currentUser.value == null) {
+            loginMade = false
+            navigationController.navigate(Screen.Register.route) {
+                popUpTo(0) { inclusive = true }
+            }
+        }
+    }
 
     val startDestination = if (isRegistered) Screen.Home.route else Screen.Register.route
 
@@ -37,16 +54,23 @@ fun NavigationHandler(preferencesManager: PreferencesManager) {
         composable(route = Screen.Register.route) {
             AppBaseContent(
                 title = Screen.Register.title,
-                onBackClick = { (context as? Activity)?.finish() }
+                onBackClick = { (context as? Activity)?.finish() },
+                sharedViewModel = sharedViewModel
             ) {
                 val registerViewModel: RegisterViewModel = hiltViewModel()
-                RegisterScreen(navigationController, registerViewModel)
+                RegisterScreen(
+                    navigationController,
+                    registerViewModel,
+                    onLogin = { loginMade = true }
+                )
             }
         }
         composable(route = Screen.Home.route) {
             AppBaseContent(
                 title = Screen.Home.title,
-                onBackClick = { (context as? Activity)?.finish() }
+                onBackClick = { (context as? Activity)?.finish() },
+                user = sharedViewModel.currentUser.collectAsState().value,
+                sharedViewModel = sharedViewModel
             ) {
                 val homeViewModel: HomeViewModel = hiltViewModel()
                 HomeScreen(navigationController, homeViewModel)
@@ -55,7 +79,9 @@ fun NavigationHandler(preferencesManager: PreferencesManager) {
         composable(route = Screen.Contacts.route) {
             AppBaseContent(
                 title = Screen.Contacts.title,
-                onBackClick = { navigationController.navigateUp() }
+                onBackClick = { navigationController.navigateUp() },
+                user = sharedViewModel.currentUser.collectAsState().value,
+                sharedViewModel = sharedViewModel
             ) {
                 val contactsViewModel: ContactsViewModel = hiltViewModel()
                 ContactsScreen(navigationController, contactsViewModel)
@@ -71,6 +97,7 @@ fun NavigationHandler(preferencesManager: PreferencesManager) {
             AppBaseContent(
                 title = Screen.Messages.title , // TODO: Pegar nome do contato
                 onBackClick = { navigationController.navigate(Screen.Home.route) },
+                sharedViewModel = sharedViewModel
             ) {
                 val chatId = it.arguments?.getString("chatId") ?: ""
                 val contactId = it.arguments?.getString("contactId") ?: ""

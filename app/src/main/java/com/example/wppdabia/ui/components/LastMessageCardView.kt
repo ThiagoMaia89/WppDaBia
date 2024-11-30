@@ -49,16 +49,16 @@ fun LastMessageCardView(contact: ContactData, onClick: () -> Unit) {
                 modifier = Modifier
                     .wrapContentHeight()
                     .wrapContentWidth()
-                    .size(24.dp)
+                    .size(48.dp)
                     .background(
                         color = MaterialTheme.colorScheme.primary,
-                        shape = MaterialTheme.shapes.medium
+                        shape = RoundedCornerShape(180.dp)
                     ),
                 contentAlignment = Alignment.Center
             ) {
                 if (contact.profileImageUrl != null) {
                     Image(
-                        modifier = Modifier.size(24.dp).clip(RoundedCornerShape(180.dp)),
+                        modifier = Modifier.size(48.dp).clip(RoundedCornerShape(180.dp)),
                         painter = rememberAsyncImagePainter(contact.profileImageUrl),
                         contentDescription = null,
                         contentScale = ContentScale.FillBounds
@@ -67,7 +67,7 @@ fun LastMessageCardView(contact: ContactData, onClick: () -> Unit) {
                     Text(
                         text = contact.name.getInitials(),
                         style = Typography.titleMedium.copy(
-                            fontSize = 12.sp,
+                            fontSize = 18.sp,
                         )
                     )
                 }
@@ -81,13 +81,13 @@ fun LastMessageCardView(contact: ContactData, onClick: () -> Unit) {
                     modifier = Modifier.wrapContentHeight(),
                     text = contact.name,
                     style = Typography.bodySmall.merge(
-                        fontSize = 12.sp
+                        fontSize = 16.sp
                     )
                 )
                 Text(
                     text = contact.lastMessage,
                     style = Typography.bodySmall.copy(
-                        fontSize = 10.sp,
+                        fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 )
@@ -99,7 +99,7 @@ fun LastMessageCardView(contact: ContactData, onClick: () -> Unit) {
                 Text(
                     text = contact.timestamp,
                     style = Typography.bodySmall.copy(
-                        fontSize = 8.sp,
+                        fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 )

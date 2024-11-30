@@ -47,4 +47,8 @@ val fakeRemote = object : Remote {
     ) {
         TODO("Not yet implemented")
     }
+
+    override fun logout() {
+        TODO("Not yet implemented")
+    }
 }

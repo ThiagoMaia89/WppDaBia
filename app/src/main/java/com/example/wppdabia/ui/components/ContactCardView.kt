@@ -53,16 +53,16 @@ fun ContactCardView(
                 modifier = Modifier
                     .wrapContentHeight()
                     .wrapContentWidth()
-                    .size(24.dp)
+                    .size(48.dp)
                     .background(
                         color = MaterialTheme.colorScheme.primary,
-                        shape = MaterialTheme.shapes.medium
+                        shape = RoundedCornerShape(180.dp)
                     ),
                 contentAlignment = Alignment.Center
             ) {
                 if (contactData.profileImageUrl != null) {
                     Image(
-                        modifier = Modifier.size(24.dp).clip(RoundedCornerShape(180.dp)),
+                        modifier = Modifier.size(48.dp).clip(RoundedCornerShape(180.dp)),
                         painter = rememberAsyncImagePainter(contactData.profileImageUrl),
                         contentDescription = null,
                         contentScale = ContentScale.FillBounds
@@ -71,7 +71,7 @@ fun ContactCardView(
                     Text(
                         text = contactData.name.getInitials(),
                         style = Typography.titleMedium.copy(
-                            fontSize = 12.sp,
+                            fontSize = 18.sp,
                             color = MaterialTheme.colorScheme.onPrimary
                         )
                     )
@@ -86,14 +86,14 @@ fun ContactCardView(
                     modifier = Modifier.wrapContentHeight(),
                     text = contactData.name,
                     style = Typography.bodySmall.merge(
-                        fontSize = 12.sp,
+                        fontSize = 16.sp,
                         color = MaterialTheme.colorScheme.primary
                     )
                 )
                 Text(
                     text = contactData.email,
                     style = Typography.bodySmall.copy(
-                        fontSize = 10.sp,
+                        fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
                     )
                 )

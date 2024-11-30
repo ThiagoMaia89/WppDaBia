@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.wppdabia.data.MessageData
 import com.example.wppdabia.data.UserData
 import com.example.wppdabia.network.Remote
-import com.example.wppdabia.ui.extensions.getCurrentUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,10 +24,9 @@ class MessageViewModel @Inject constructor(private val remote: Remote) : ViewMod
     private val currentUser = MutableLiveData<UserData?>()
 
     private val _isSentByUser = MutableStateFlow(false)
-    val isSentByUser: StateFlow<Boolean> = _isSentByUser
 
     init {
-        viewModelScope.launch { getCurrentUser(currentUser, remote) }
+        viewModelScope.launch { getCurrentUser() }
     }
 
     fun fetchMessages(chatId: String) {
@@ -40,10 +38,8 @@ class MessageViewModel @Inject constructor(private val remote: Remote) : ViewMod
     }
 
     fun sendMessage(chatId: String, contactId: String, content: String, lastMessage: String) {
-
         val senderId = currentUser.value?.uid
         _isSentByUser.value = senderId != contactId
-
         val newMessage = MessageData(
             sender = currentUser.value ?: UserData(),
             content = content,
@@ -52,6 +48,17 @@ class MessageViewModel @Inject constructor(private val remote: Remote) : ViewMod
             lastMessage = lastMessage
         )
         viewModelScope.launch { remote.sendMessage(chatId, newMessage) }
+    }
+
+    private suspend fun getCurrentUser() {
+        remote.getCurrentUser(
+            onSuccess = { userData ->
+                currentUser.value = userData
+            },
+            onError = {
+                currentUser.value = null
+            }
+        )
     }
 
     fun sendPhoto() {

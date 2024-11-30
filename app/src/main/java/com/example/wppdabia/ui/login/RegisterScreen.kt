@@ -61,6 +61,7 @@ import com.example.wppdabia.R
 import com.example.wppdabia.data.UserData
 import com.example.wppdabia.data.data_store.PreferencesManager
 import com.example.wppdabia.domain.utils.ImageHandler
+import com.example.wppdabia.ui.SharedViewModel
 import com.example.wppdabia.ui.components.AppBaseContent
 import com.example.wppdabia.ui.components.bottomsheet.ChooseImageBottomSheet
 import com.example.wppdabia.ui.components.bottomsheet.LoginBottomSheet
@@ -72,7 +73,7 @@ import com.example.wppdabia.ui.theme.Typography
 import kotlinx.coroutines.launch
 
 @Composable
-fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
+fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel, onLogin: () -> Unit) {
     val context = LocalContext.current
     var email by remember { mutableStateOf("") }
     var userName by remember { mutableStateOf("") }
@@ -384,6 +385,7 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
                             password = userPassword
                         ),
                         onSuccess = {
+                            onLogin.invoke()
                             navController.navigate(Screen.Home.route)
                         },
                         onError = {
@@ -402,11 +404,13 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
 fun RegisterScreenPreview() {
     AppBaseContent(
         title = "Cadastro",
-        onBackClick = {}
+        onBackClick = {},
+        sharedViewModel = SharedViewModel(fakeRemote, PreferencesManager(LocalContext.current))
     ) {
         RegisterScreen(
             rememberNavController(),
-            RegisterViewModel(PreferencesManager(LocalContext.current), remote = fakeRemote)
+            RegisterViewModel(PreferencesManager(LocalContext.current), remote = fakeRemote),
+            onLogin = {}
         )
     }
 }

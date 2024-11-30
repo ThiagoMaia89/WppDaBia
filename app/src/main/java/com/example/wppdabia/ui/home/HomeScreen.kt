@@ -2,7 +2,6 @@ package com.example.wppdabia.ui.home
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -15,23 +14,19 @@ import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.wppdabia.R
 import com.example.wppdabia.data.data_store.PreferencesManager
+import com.example.wppdabia.ui.SharedViewModel
 import com.example.wppdabia.ui.components.AppBaseContent
 import com.example.wppdabia.ui.components.LastMessageCardView
 import com.example.wppdabia.ui.components.NoMessageAlert
@@ -43,7 +38,7 @@ import com.example.wppdabia.ui.navigation.Screen
 fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
 
     val lastMessages = viewModel.lastMessageCardViews.collectAsState().value
-    val currentUser = viewModel.currentUser.observeAsState().value
+    val currentUser = viewModel.currentUser.collectAsState().value
 
     Column(modifier = Modifier
         .fillMaxSize()
@@ -87,25 +82,6 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
                     tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
-            TextButton(
-                modifier = Modifier.align(Alignment.BottomStart),
-                onClick = {
-                    viewModel.logout()
-                    navController.navigate(Screen.Register.route) {
-                        popUpTo(Screen.Home.route) { inclusive = true }
-                    }
-                },
-                contentPadding = PaddingValues(horizontal = 0.dp)
-            ) {
-                Text(
-                    text = "Logout",
-                    textAlign = TextAlign.Start,
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold,
-                        textDecoration = TextDecoration.Underline
-                    )
-                )
-            }
         }
     }
 }
@@ -115,13 +91,13 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
 fun HomeScreenPreview() {
     AppBaseContent(
         title = "Home",
-        onBackClick = {}
+        onBackClick = {},
+        sharedViewModel = SharedViewModel(fakeRemote, PreferencesManager(LocalContext.current))
     ) {
         HomeScreen(
             navController = rememberNavController(),
             viewModel = HomeViewModel(
-                remote = fakeRemote,
-                preferencesManager = PreferencesManager(LocalContext.current)
+                remote = fakeRemote
             )
         )
     }

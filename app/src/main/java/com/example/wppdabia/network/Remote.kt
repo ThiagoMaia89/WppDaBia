@@ -1,5 +1,6 @@
 package com.example.wppdabia.network
 
+import androidx.navigation.NavController
 import com.example.wppdabia.data.ContactData
 import com.example.wppdabia.data.MessageData
 import com.example.wppdabia.data.UserData
@@ -20,4 +21,6 @@ interface Remote {
     suspend fun fetchMessages(chatId: String): Flow<List<MessageData>>
 
     suspend fun getAllChats(currentUserUid: String, onSuccess: (List<ContactData>) -> Unit, onError: (String) -> Unit)
+
+    fun logout()
 }

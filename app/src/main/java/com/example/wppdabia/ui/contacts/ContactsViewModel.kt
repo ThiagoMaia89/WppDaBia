@@ -8,11 +8,6 @@ import androidx.navigation.NavController
 import com.example.wppdabia.data.ContactData
 import com.example.wppdabia.data.UserData
 import com.example.wppdabia.network.Remote
-import com.example.wppdabia.ui.extensions.getCurrentUser
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,7 +28,7 @@ class ContactsViewModel @Inject constructor(private val remote: Remote) : ViewMo
 
     init {
         getContacts()
-        viewModelScope.launch { getCurrentUser(currentUser, remote) }
+        viewModelScope.launch { getCurrentUser() }
     }
 
     private fun getContacts() {
@@ -50,6 +45,17 @@ class ContactsViewModel @Inject constructor(private val remote: Remote) : ViewMo
                 }
             )
         }
+    }
+
+    private suspend fun getCurrentUser() {
+        remote.getCurrentUser(
+            onSuccess = { userData ->
+                currentUser.value = userData
+            },
+            onError = {
+                currentUser.value = null
+            }
+        )
     }
 
     fun navigateToChat(contactId: String, navController: NavController) {

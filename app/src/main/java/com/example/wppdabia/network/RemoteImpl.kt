@@ -1,9 +1,11 @@
 package com.example.wppdabia.network
 
 import androidx.core.net.toUri
+import androidx.navigation.NavController
 import com.example.wppdabia.data.ContactData
 import com.example.wppdabia.data.MessageData
 import com.example.wppdabia.data.UserData
+import com.example.wppdabia.ui.navigation.Screen
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -161,7 +163,7 @@ class RemoteImpl : Remote {
         val databaseRef = database.reference.child("chats")
 
         databaseRef.orderByKey()
-            .addListenerForSingleValueEvent(object : ValueEventListener {
+            .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val chatPreviews = mutableListOf<ContactData>()
 
@@ -215,5 +217,11 @@ class RemoteImpl : Remote {
             })
     }
 
-
+    override fun logout() {
+        try {
+            FirebaseAuth.getInstance().signOut()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 }
