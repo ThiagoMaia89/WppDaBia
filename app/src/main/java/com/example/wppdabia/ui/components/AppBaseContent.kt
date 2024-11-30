@@ -100,7 +100,7 @@ fun WppDaBiaTopBar(
                         shape = RoundedCornerShape(180.dp)
                     )
                     .clickable {
-                        sharedViewModel.logout()
+                        sharedViewModel.logout() //TODO: DROPDOWNMENU
                     },
                 contentAlignment = Alignment.Center
             ) {
