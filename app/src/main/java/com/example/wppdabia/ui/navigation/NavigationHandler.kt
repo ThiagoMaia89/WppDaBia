@@ -101,6 +101,7 @@ fun NavigationHandler(preferencesManager: PreferencesManager, onLogout: () -> Un
             AppBaseContent(
                 title = Screen.Messages.title , // TODO: Pegar nome do contato
                 onBackClick = { navigationController.navigate(Screen.Home.route) },
+                user = sharedViewModel.currentUser.collectAsState().value,
                 sharedViewModel = sharedViewModel
             ) {
                 val chatId = it.arguments?.getString("chatId") ?: ""

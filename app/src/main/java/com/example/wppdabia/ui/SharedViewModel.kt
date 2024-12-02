@@ -1,5 +1,7 @@
 package com.example.wppdabia.ui
 
+import android.net.Uri
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,10 +18,13 @@ import javax.inject.Inject
 class SharedViewModel @Inject constructor(
     private val remote: Remote,
     private val preferencesManager: PreferencesManager
-): ViewModel() {
+) : ViewModel() {
 
     private val _currentUser = MutableStateFlow<UserData?>(UserData())
     val currentUser: StateFlow<UserData?> = _currentUser
+
+    private var _capturedImageUri = MutableLiveData<String?>()
+    val capturedImageUri: LiveData<String?> = _capturedImageUri
 
     var logout = MutableLiveData(false)
 
@@ -34,8 +39,31 @@ class SharedViewModel @Inject constructor(
         )
     }
 
+    fun saveCapturedImage(uri: Uri) {
+        _capturedImageUri.value = uri.toString()
+    }
+
+    fun updateProfileImage(
+        newImageUrl: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            remote.updateProfileImage(
+                newImageUrl,
+                onSuccess = {
+                    _currentUser.value = _currentUser.value?.copy(profileImageUrl = newImageUrl)
+                    onSuccess.invoke()
+                },
+                onError = {
+                    onError.invoke(it.message ?: "Erro")
+                }
+            )
+        }
+    }
+
     fun logout() {
-       remote.logout()
+        remote.logout()
         viewModelScope.launch { preferencesManager.saveIsRegistered(false) }
         logout.value = true
     }

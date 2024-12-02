@@ -217,6 +217,16 @@ class RemoteImpl : Remote {
             })
     }
 
+    override suspend fun updateProfileImage(newImageUrl: String, onSuccess: () -> Unit, onError: (Exception) -> Unit) {
+        val userId = auth.currentUser?.uid ?: return onError(IllegalStateException("Usuário não autenticado"))
+        val userRef = database.reference.child("users").child(userId)
+
+        userRef.child("profileImageUrl")
+            .setValue(newImageUrl)
+            .addOnSuccessListener { onSuccess.invoke() }
+            .addOnFailureListener { onError.invoke(it) }
+    }
+
     override fun logout() {
         try {
             FirebaseAuth.getInstance().signOut()

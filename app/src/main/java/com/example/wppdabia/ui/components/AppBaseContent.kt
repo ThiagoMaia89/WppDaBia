@@ -1,5 +1,6 @@
 package com.example.wppdabia.ui.components
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -48,8 +49,11 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.wppdabia.R
 import com.example.wppdabia.data.UserData
 import com.example.wppdabia.data.data_store.PreferencesManager
+import com.example.wppdabia.domain.utils.ImageHandler
 import com.example.wppdabia.ui.SharedViewModel
+import com.example.wppdabia.ui.components.bottomsheet.ChooseImageBottomSheet
 import com.example.wppdabia.ui.extensions.getInitials
+import com.example.wppdabia.ui.extensions.toUri
 import com.example.wppdabia.ui.mock.fakeRemote
 import com.example.wppdabia.ui.theme.Typography
 import com.example.wppdabia.ui.theme.WppDaBiaTheme
@@ -92,8 +96,59 @@ fun WppDaBiaTopBar(
     user: UserData?,
     sharedViewModel: SharedViewModel
 ) {
+    val context = LocalContext.current
     var showMenu by remember { mutableStateOf(false) }
     var imageLoading by remember { mutableStateOf(false) }
+    var showPhotoBottomSheet by remember { mutableStateOf(false) }
+    lateinit var imageHandler: ImageHandler
+    var requestPermission by remember { mutableStateOf(false) }
+    var permissionDeniedToast by remember { mutableStateOf(false) }
+    var cropErrorToast by remember { mutableStateOf(false) }
+
+    imageHandler = remember {
+        ImageHandler(
+            onImageCaptured = { bitmap ->
+                imageHandler.startCrop(context, bitmap.toUri(context))
+            },
+            onImageSelected = { uri ->
+                imageHandler.startCrop(context, uri)
+            },
+            onImageCropped = { croppedUri ->
+                imageLoading = true
+                sharedViewModel.saveCapturedImage(croppedUri)
+                sharedViewModel.updateProfileImage(
+                    newImageUrl = croppedUri.toString(),
+                    onSuccess = {
+                        imageLoading = false
+                    },
+                    onError = {
+                        imageLoading = false
+                        cropErrorToast = true
+                    }
+                )
+            },
+            onCropError = { error ->
+                cropErrorToast = error
+            }
+        )
+    }
+
+    if (requestPermission) {
+        imageHandler.RequestCameraPermission(
+            onPermissionGranted = {
+                imageHandler.cameraLauncher.launch(null)
+                requestPermission = false
+                showPhotoBottomSheet = false
+            },
+            onPermissionDenied = {
+                permissionDeniedToast = true
+                requestPermission = false
+                showPhotoBottomSheet = false
+            }
+        )
+    }
+
+    imageHandler.InitializeLaunchers()
 
     TopAppBar(
         title = { Text(text = title, style = MaterialTheme.typography.titleLarge) },
@@ -149,7 +204,9 @@ fun WppDaBiaTopBar(
                 expanded = showMenu,
                 onDismissRequest = { showMenu = false }
             ) {
-                Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+                Column(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)) {
                     Box(
                         modifier = Modifier
                             .wrapContentHeight()
@@ -208,7 +265,7 @@ fun WppDaBiaTopBar(
                         ) {
                             IconButton(
                                 onClick = {
-                                    //showPhotoBottomSheet = true TODO: Chamar bottomsheet de foto
+                                    showPhotoBottomSheet = true
                                 },
                             ) {
                                 Icon(
@@ -243,6 +300,26 @@ fun WppDaBiaTopBar(
                         )
                     }
                 }
+            }
+
+            if (permissionDeniedToast) {
+                Toast.makeText(LocalContext.current, "Permissão Negada", Toast.LENGTH_SHORT).show()
+                permissionDeniedToast = !permissionDeniedToast
+            }
+            if (cropErrorToast) {
+                Toast.makeText(LocalContext.current, "Erro ao cortar a imagem", Toast.LENGTH_SHORT)
+                    .show()
+                cropErrorToast = !cropErrorToast
+            }
+
+            if (showPhotoBottomSheet) {
+                ChooseImageBottomSheet(
+                    onCameraClick = {
+                        requestPermission = true
+                    },
+                    onGalleryClick = { imageHandler.galleryLauncher.launch("image/*") },
+                    onDismiss = { showPhotoBottomSheet = false }
+                )
             }
         },
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
