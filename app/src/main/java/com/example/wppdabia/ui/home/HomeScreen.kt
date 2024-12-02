@@ -59,7 +59,7 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
                         LastMessageCardView(
                             contact = contact,
                             onClick = {
-                                navController.navigate("messages/${contact.chatId}/${contact.id}")
+                                navController.navigate("messages/${contact.chatId}/${contact.id}/${contact.name}/${contact.profileImageUrl}")
                             }
                         )
                     }

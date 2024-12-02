@@ -1,11 +1,9 @@
 package com.example.wppdabia.network
 
 import androidx.core.net.toUri
-import androidx.navigation.NavController
 import com.example.wppdabia.data.ContactData
 import com.example.wppdabia.data.MessageData
 import com.example.wppdabia.data.UserData
-import com.example.wppdabia.ui.navigation.Screen
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -217,14 +215,39 @@ class RemoteImpl : Remote {
             })
     }
 
-    override suspend fun updateProfileImage(newImageUrl: String, onSuccess: () -> Unit, onError: (Exception) -> Unit) {
-        val userId = auth.currentUser?.uid ?: return onError(IllegalStateException("Usuário não autenticado"))
-        val userRef = database.reference.child("users").child(userId)
+    override suspend fun updateProfileImage(
+        newImageUrl: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val currentUser = auth.currentUser
+        if (currentUser == null) {
+            onError("Usuário não autenticado.")
+            return
+        }
+        val userId = currentUser.uid
+        val storageRef = storage.reference.child("profile_images/$userId.jpg")
 
-        userRef.child("profileImageUrl")
-            .setValue(newImageUrl)
-            .addOnSuccessListener { onSuccess.invoke() }
-            .addOnFailureListener { onError.invoke(it) }
+        storageRef.putFile(newImageUrl.toUri())
+            .addOnSuccessListener {
+
+                storageRef.downloadUrl.addOnSuccessListener { downloadUri ->
+                    database.reference.child("users").child(userId)
+                        .child("profileImageUrl")
+                        .setValue(downloadUri.toString())
+                        .addOnSuccessListener {
+                            onSuccess()
+                        }
+                        .addOnFailureListener { e ->
+                            onError("Erro ao salvar URL no banco de dados: ${e.message}")
+                        }
+                }.addOnFailureListener { e ->
+                    onError("Erro ao obter URL da imagem: ${e.message}")
+                }
+            }
+            .addOnFailureListener { e ->
+                onError("Erro ao fazer upload da imagem: ${e.message}")
+            }
     }
 
     override fun logout() {

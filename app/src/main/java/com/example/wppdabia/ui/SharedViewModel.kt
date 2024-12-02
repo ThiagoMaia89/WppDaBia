@@ -1,6 +1,7 @@
 package com.example.wppdabia.ui
 
 import android.net.Uri
+import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -56,7 +57,7 @@ class SharedViewModel @Inject constructor(
                     onSuccess.invoke()
                 },
                 onError = {
-                    onError.invoke(it.message ?: "Erro")
+                    onError.invoke(it)
                 }
             )
         }

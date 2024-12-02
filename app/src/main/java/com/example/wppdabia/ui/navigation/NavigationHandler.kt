@@ -59,6 +59,7 @@ fun NavigationHandler(preferencesManager: PreferencesManager, onLogout: () -> Un
             AppBaseContent(
                 title = Screen.Register.title,
                 onBackClick = { (context as? Activity)?.finish() },
+                hasBackButton = false,
                 sharedViewModel = sharedViewModel
             ) {
                 val registerViewModel: RegisterViewModel = hiltViewModel()
@@ -73,6 +74,7 @@ fun NavigationHandler(preferencesManager: PreferencesManager, onLogout: () -> Un
             AppBaseContent(
                 title = Screen.Home.title,
                 onBackClick = { (context as? Activity)?.finish() },
+                hasBackButton = false,
                 user = sharedViewModel.currentUser.collectAsState().value,
                 sharedViewModel = sharedViewModel
             ) {
@@ -95,17 +97,23 @@ fun NavigationHandler(preferencesManager: PreferencesManager, onLogout: () -> Un
             route = Screen.Messages.route,
             arguments = listOf(
                 navArgument("chatId") { type = NavType.StringType },
-                navArgument("contactId") { type = NavType.StringType }
+                navArgument("contactId") { type = NavType.StringType },
+                navArgument("contactName") { type = NavType.StringType }
             )
         ) {
+
+            val chatId = it.arguments?.getString("chatId") ?: ""
+            val contactId = it.arguments?.getString("contactId") ?: ""
+            val contactName = it.arguments?.getString("contactName")
+
             AppBaseContent(
-                title = Screen.Messages.title , // TODO: Pegar nome do contato
+                title = contactName ?: Screen.Messages.title ,
                 onBackClick = { navigationController.navigate(Screen.Home.route) },
                 user = sharedViewModel.currentUser.collectAsState().value,
+                showProfileImage = false,
                 sharedViewModel = sharedViewModel
             ) {
-                val chatId = it.arguments?.getString("chatId") ?: ""
-                val contactId = it.arguments?.getString("contactId") ?: ""
+
                 val messageViewModel: MessageViewModel = hiltViewModel()
 
                 MessageScreen(
@@ -123,5 +131,5 @@ sealed class Screen(val route: String, val title: String = "") {
     data object Register : Screen(route = "login_screen", title = "Cadastro")
     data object Home : Screen(route = "home_screen", title = "Wpp da Bia")
     data object Contacts : Screen(route = "contacts_screen", title = "Contatos")
-    data object Messages : Screen(route = "messages/{chatId}/{contactId}", title = "Mensagem")
+    data object Messages : Screen(route = "messages/{chatId}/{contactId}/{contactName}", title = "Mensagem")
 }

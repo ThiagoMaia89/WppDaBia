@@ -119,7 +119,10 @@ fun ContactsScreen(navController: NavController, viewModel: ContactsViewModel) {
                     ContactCardView(
                         contactData = contact,
                         onCardClick = {
-                            viewModel.navigateToChat(contact.id, navController)
+                            viewModel.navigateToChat(
+                                contactId = contact.id,
+                                contactName = contact.name,
+                                navController = navController)
                         }
                     )
                 }

@@ -1,5 +1,6 @@
 package com.example.wppdabia.network
 
+import android.net.Uri
 import androidx.navigation.NavController
 import com.example.wppdabia.data.ContactData
 import com.example.wppdabia.data.MessageData
@@ -22,7 +23,7 @@ interface Remote {
 
     suspend fun getAllChats(currentUserUid: String, onSuccess: (List<ContactData>) -> Unit, onError: (String) -> Unit)
 
-    suspend fun updateProfileImage(newImageUrl: String, onSuccess: () -> Unit, onError: (Exception) -> Unit)
+    suspend fun updateProfileImage(newImageUrl: String, onSuccess: () -> Unit, onError: (String) -> Unit)
 
     fun logout()
 }

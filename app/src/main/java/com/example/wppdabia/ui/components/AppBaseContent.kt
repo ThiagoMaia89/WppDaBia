@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -42,6 +43,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -62,6 +65,8 @@ import com.example.wppdabia.ui.theme.WppDaBiaTheme
 fun AppBaseContent(
     title: String,
     onBackClick: () -> Unit,
+    hasBackButton: Boolean = true,
+    showProfileImage: Boolean = true,
     user: UserData? = null,
     sharedViewModel: SharedViewModel,
     content: @Composable () -> Unit
@@ -75,6 +80,8 @@ fun AppBaseContent(
             WppDaBiaTopBar(
                 title = title,
                 onBackClick = onBackClick,
+                hasBackButton = hasBackButton,
+                showProfileImage = showProfileImage,
                 user = user,
                 sharedViewModel = sharedViewModel
             )
@@ -93,6 +100,8 @@ fun AppBaseContent(
 fun WppDaBiaTopBar(
     title: String,
     onBackClick: () -> Unit,
+    hasBackButton: Boolean = true,
+    showProfileImage: Boolean = true,
     user: UserData?,
     sharedViewModel: SharedViewModel
 ) {
@@ -151,153 +160,164 @@ fun WppDaBiaTopBar(
     imageHandler.InitializeLaunchers()
 
     TopAppBar(
-        title = { Text(text = title, style = MaterialTheme.typography.titleLarge) },
-        navigationIcon = {
-            IconButton(onClick = { onBackClick.invoke() }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Voltar",
-                    tint = MaterialTheme.colorScheme.onPrimary
-                )
-            }
+        title = {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium.copy(fontFamily = FontFamily.Monospace, fontStyle = FontStyle.Italic, fontSize = 20.sp)
+            )
         },
-        actions = {
-            Box(
-                modifier = Modifier
-                    .wrapContentHeight()
-                    .wrapContentWidth()
-                    .size(24.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        shape = RoundedCornerShape(180.dp)
-                    )
-                    .clickable {
-                        showMenu = !showMenu
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                if (!user?.profileImageUrl.isNullOrEmpty()) {
-                    Image(
-                        modifier = Modifier
-                            .size(24.dp)
-                            .clip(RoundedCornerShape(180.dp)),
-                        painter = rememberAsyncImagePainter(user?.profileImageUrl),
-                        contentDescription = null,
-                        contentScale = ContentScale.FillBounds
-                    )
-                } else {
-                    Text(
-                        text = user?.name?.getInitials() ?: "",
-                        style = Typography.titleMedium.copy(
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.primary
-                        )
+        navigationIcon = {
+            if (hasBackButton) {
+                IconButton(onClick = { onBackClick.invoke() }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Voltar",
+                        tint = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             }
-            Spacer(Modifier.width(12.dp))
-
-            DropdownMenu(
-                modifier = Modifier
-                    .background(color = MaterialTheme.colorScheme.primary)
-                    .border(width = 1.dp, color = Color.White),
-                expanded = showMenu,
-                onDismissRequest = { showMenu = false }
-            ) {
-                Column(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)) {
-                    Box(
-                        modifier = Modifier
-                            .wrapContentHeight()
-                            .wrapContentWidth()
-                            .size(100.dp)
-                            .background(
-                                color = MaterialTheme.colorScheme.tertiary,
-                                shape = RoundedCornerShape(180.dp)
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (user?.profileImageUrl != null) {
-                            Image(
-                                painter = rememberAsyncImagePainter(
-                                    model = user.profileImageUrl,
-                                    onLoading = {
-                                        imageLoading = true
-                                    },
-                                    onError = {
-                                        imageLoading = false
-                                    },
-                                    onSuccess = {
-                                        imageLoading = false
-                                    }
-                                ),
-                                contentDescription = "Imagem de perfil",
-                                modifier = Modifier
-                                    .size(180.dp)
-                                    .clip(CircleShape)
-                            )
-                        } else if (imageLoading) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(60.dp),
-                                strokeWidth = 5.dp,
-                                color = Color.White
-                            )
-                        } else {
-                            Text(
-                                text = user?.name?.getInitials() ?: "Desconhecido",
-                                style = Typography.titleMedium.copy(
-                                    fontSize = 60.sp,
-                                )
-                            )
-                        }
-
-                        Box(
+        },
+        actions = {
+            if (showProfileImage) {
+                Box(
+                    modifier = Modifier
+                        .wrapContentHeight()
+                        .wrapContentWidth()
+                        .size(24.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            shape = RoundedCornerShape(180.dp)
+                        )
+                        .clickable {
+                            showMenu = !showMenu
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (!user?.profileImageUrl.isNullOrEmpty()) {
+                        Image(
                             modifier = Modifier
                                 .size(24.dp)
+                                .clip(RoundedCornerShape(180.dp)),
+                            painter = rememberAsyncImagePainter(user?.profileImageUrl),
+                            contentDescription = null,
+                            contentScale = ContentScale.FillBounds
+                        )
+                    } else {
+                        Text(
+                            text = user?.name?.getInitials() ?: "",
+                            style = Typography.titleMedium.copy(
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        )
+                    }
+                }
+                Spacer(Modifier.width(12.dp))
+
+                DropdownMenu(
+                    modifier = Modifier
+                        .background(color = MaterialTheme.colorScheme.primary)
+                        .border(width = 1.dp, color = Color.White),
+                    expanded = showMenu,
+                    onDismissRequest = { showMenu = false }
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .wrapContentHeight()
+                                .wrapContentWidth()
+                                .size(100.dp)
                                 .background(
                                     color = MaterialTheme.colorScheme.tertiary,
                                     shape = RoundedCornerShape(180.dp)
-                                )
-                                .align(Alignment.BottomEnd)
-                                .padding(4.dp),
+                                ),
                             contentAlignment = Alignment.Center
                         ) {
-                            IconButton(
-                                onClick = {
-                                    showPhotoBottomSheet = true
-                                },
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_add_photo),
-                                    contentDescription = "Selecionar foto",
-                                    tint = MaterialTheme.colorScheme.onTertiary
+                            if (user?.profileImageUrl != null) {
+                                Image(
+                                    painter = rememberAsyncImagePainter(
+                                        model = user.profileImageUrl,
+                                        onLoading = {
+                                            imageLoading = true
+                                        },
+                                        onError = {
+                                            imageLoading = false
+                                        },
+                                        onSuccess = {
+                                            imageLoading = false
+                                        }
+                                    ),
+                                    contentDescription = "Imagem de perfil",
+                                    modifier = Modifier
+                                        .size(180.dp)
+                                        .clip(CircleShape)
+                                )
+                            } else if (imageLoading) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(60.dp),
+                                    strokeWidth = 5.dp,
+                                    color = Color.White
+                                )
+                            } else {
+                                Text(
+                                    text = user?.name?.getInitials() ?: "Desconhecido",
+                                    style = Typography.titleMedium.copy(
+                                        fontSize = 60.sp,
+                                    )
                                 )
                             }
-                        }
-                    }
 
-                    Spacer(modifier = Modifier.height(48.dp))
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight()
-                            .border(
-                                width = 1.dp,
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                shape = RoundedCornerShape(8.dp)
+                            Box(
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .background(
+                                        color = MaterialTheme.colorScheme.tertiary,
+                                        shape = RoundedCornerShape(180.dp)
+                                    )
+                                    .align(Alignment.BottomEnd)
+                                    .padding(4.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                IconButton(
+                                    onClick = {
+                                        showPhotoBottomSheet = true
+                                    },
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.ic_add_photo),
+                                        contentDescription = "Selecionar foto",
+                                        tint = MaterialTheme.colorScheme.onTertiary
+                                    )
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(48.dp))
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight()
+                                .border(
+                                    width = 1.dp,
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                                .padding(4.dp)
+                                .clickable {
+                                    sharedViewModel.logout()
+                                    showMenu = false
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "Logout",
+                                style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onTertiary)
                             )
-                            .padding(4.dp)
-                            .clickable {
-                                sharedViewModel.logout()
-                                showMenu = false
-                            },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "Logout",
-                            style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onTertiary)
-                        )
+                        }
                     }
                 }
             }

@@ -58,9 +58,9 @@ class ContactsViewModel @Inject constructor(private val remote: Remote) : ViewMo
         )
     }
 
-    fun navigateToChat(contactId: String, navController: NavController) {
+    fun navigateToChat(contactId: String, contactName: String, navController: NavController) {
         val chatId = generateChatId(currentUser.value?.uid ?: "", contactId)
-        navController.navigate("messages/$chatId/$contactId")
+        navController.navigate("messages/$chatId/$contactId/$contactName")
     }
 
     private fun generateChatId(user1: String, user2: String): String {
