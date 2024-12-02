@@ -48,6 +48,14 @@ val fakeRemote = object : Remote {
         TODO("Not yet implemented")
     }
 
+    override suspend fun updateProfileImage(
+        newImageUrl: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        TODO("Not yet implemented")
+    }
+
     override fun logout() {
         TODO("Not yet implemented")
     }

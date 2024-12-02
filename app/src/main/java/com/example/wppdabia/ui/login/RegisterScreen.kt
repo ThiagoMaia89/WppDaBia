@@ -43,6 +43,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -73,7 +75,11 @@ import com.example.wppdabia.ui.theme.Typography
 import kotlinx.coroutines.launch
 
 @Composable
-fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel, onLogin: () -> Unit) {
+fun RegisterScreen(
+    navController: NavController,
+    viewModel: RegisterViewModel,
+    onLogin: () -> Unit
+) {
     val context = LocalContext.current
     var email by remember { mutableStateOf("") }
     var userName by remember { mutableStateOf("") }
@@ -135,8 +141,8 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel, o
             modifier = Modifier
                 .wrapContentHeight()
                 .wrapContentWidth()
-                .padding(top = 24.dp)
-                .size(180.dp)
+                .padding(top = 48.dp)
+                .size(140.dp)
                 .background(
                     color = MaterialTheme.colorScheme.primary,
                     shape = RoundedCornerShape(180.dp)
@@ -159,7 +165,7 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel, o
                     ),
                     contentDescription = "Imagem de perfil",
                     modifier = Modifier
-                        .size(180.dp)
+                        .size(140.dp)
                         .clip(CircleShape)
                 )
             } else if (imageLoading) {

@@ -60,6 +60,7 @@ fun NavigationHandler(preferencesManager: PreferencesManager, onLogout: () -> Un
                 title = Screen.Register.title,
                 onBackClick = { (context as? Activity)?.finish() },
                 hasBackButton = false,
+                showProfileImage = false,
                 sharedViewModel = sharedViewModel
             ) {
                 val registerViewModel: RegisterViewModel = hiltViewModel()

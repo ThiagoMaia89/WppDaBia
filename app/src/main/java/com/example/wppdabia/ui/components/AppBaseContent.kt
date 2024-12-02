@@ -7,7 +7,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,7 +22,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -107,7 +105,7 @@ fun WppDaBiaTopBar(
 ) {
     val context = LocalContext.current
     var showMenu by remember { mutableStateOf(false) }
-    var imageLoading by remember { mutableStateOf(false) }
+    var dropDownImageLoading by remember { mutableStateOf(false) }
     var showPhotoBottomSheet by remember { mutableStateOf(false) }
     lateinit var imageHandler: ImageHandler
     var requestPermission by remember { mutableStateOf(false) }
@@ -123,15 +121,15 @@ fun WppDaBiaTopBar(
                 imageHandler.startCrop(context, uri)
             },
             onImageCropped = { croppedUri ->
-                imageLoading = true
+                dropDownImageLoading = true
                 sharedViewModel.saveCapturedImage(croppedUri)
                 sharedViewModel.updateProfileImage(
                     newImageUrl = croppedUri.toString(),
                     onSuccess = {
-                        imageLoading = false
+                        dropDownImageLoading = false
                     },
                     onError = {
-                        imageLoading = false
+                        dropDownImageLoading = false
                         cropErrorToast = true
                     }
                 )
@@ -242,21 +240,21 @@ fun WppDaBiaTopBar(
                                     painter = rememberAsyncImagePainter(
                                         model = user.profileImageUrl,
                                         onLoading = {
-                                            imageLoading = true
+                                            dropDownImageLoading = true
                                         },
                                         onError = {
-                                            imageLoading = false
+                                            dropDownImageLoading = false
                                         },
                                         onSuccess = {
-                                            imageLoading = false
+                                            dropDownImageLoading = false
                                         }
                                     ),
                                     contentDescription = "Imagem de perfil",
                                     modifier = Modifier
-                                        .size(180.dp)
+                                        .size(100.dp)
                                         .clip(CircleShape)
                                 )
-                            } else if (imageLoading) {
+                            } else if (dropDownImageLoading) {
                                 CircularProgressIndicator(
                                     modifier = Modifier.size(60.dp),
                                     strokeWidth = 5.dp,
