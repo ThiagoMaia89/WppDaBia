@@ -66,7 +66,8 @@ class MessageViewModel @Inject constructor(private val remote: Remote) : ViewMod
     }
 
     private fun getCurrentTimestamp(): String {
-        return SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
+        val hours = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
+        val date = SimpleDateFormat("dd/MM/yy", Locale.getDefault()).format(Date())
+        return "$hours - $date"
     }
-
 }
