@@ -53,6 +53,7 @@ import com.example.wppdabia.data.data_store.PreferencesManager
 import com.example.wppdabia.domain.utils.ImageHandler
 import com.example.wppdabia.ui.SharedViewModel
 import com.example.wppdabia.ui.components.bottomsheet.ChooseImageBottomSheet
+import com.example.wppdabia.ui.components.dialog.ImageDialog
 import com.example.wppdabia.ui.extensions.getInitials
 import com.example.wppdabia.ui.extensions.toUri
 import com.example.wppdabia.ui.mock.fakeRemote
@@ -111,6 +112,7 @@ fun WppDaBiaTopBar(
     var requestPermission by remember { mutableStateOf(false) }
     var permissionDeniedToast by remember { mutableStateOf(false) }
     var cropErrorToast by remember { mutableStateOf(false) }
+    var showImageDialog by remember { mutableStateOf(false) }
 
     imageHandler = remember {
         ImageHandler(
@@ -161,7 +163,11 @@ fun WppDaBiaTopBar(
         title = {
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleMedium.copy(fontFamily = FontFamily.Monospace, fontStyle = FontStyle.Italic, fontSize = 20.sp)
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontFamily = FontFamily.Monospace,
+                    fontStyle = FontStyle.Italic,
+                    fontSize = 20.sp
+                )
             )
         },
         navigationIcon = {
@@ -253,6 +259,9 @@ fun WppDaBiaTopBar(
                                     modifier = Modifier
                                         .size(100.dp)
                                         .clip(CircleShape)
+                                        .clickable {
+                                            showImageDialog = true
+                                        },
                                 )
                             } else if (dropDownImageLoading) {
                                 CircularProgressIndicator(
@@ -338,6 +347,12 @@ fun WppDaBiaTopBar(
                     onGalleryClick = { imageHandler.galleryLauncher.launch("image/*") },
                     onDismiss = { showPhotoBottomSheet = false }
                 )
+            }
+
+            if (showImageDialog) {
+                ImageDialog(
+                    imageUrl = user?.profileImageUrl,
+                    onDismissRequest = { showImageDialog = false })
             }
         },
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(

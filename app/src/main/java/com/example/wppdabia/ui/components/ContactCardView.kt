@@ -19,6 +19,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.wppdabia.data.ContactData
+import com.example.wppdabia.ui.components.dialog.ImageDialog
 import com.example.wppdabia.ui.extensions.getInitials
 import com.example.wppdabia.ui.theme.Typography
 import com.example.wppdabia.ui.theme.WppDaBiaTheme
@@ -38,6 +43,9 @@ fun ContactCardView(
     contactData: ContactData,
     onCardClick: () -> Unit
 ) {
+
+    var showImageDialog by remember { mutableStateOf(false) }
+
     Column {
         Row(
             modifier = modifier
@@ -62,7 +70,12 @@ fun ContactCardView(
             ) {
                 if (contactData.profileImageUrl != null) {
                     Image(
-                        modifier = Modifier.size(48.dp).clip(RoundedCornerShape(180.dp)),
+                        modifier = Modifier
+                            .size(48.dp).
+                            clip(RoundedCornerShape(180.dp))
+                            .clickable {
+                                showImageDialog = true
+                            },
                         painter = rememberAsyncImagePainter(contactData.profileImageUrl),
                         contentDescription = null,
                         contentScale = ContentScale.FillBounds
@@ -100,6 +113,13 @@ fun ContactCardView(
             }
         }
         Spacer(modifier = Modifier.fillMaxWidth().height(1.dp).background(color = MaterialTheme.colorScheme.primary))
+
+        if (showImageDialog) {
+            ImageDialog(contactData.profileImageUrl) {
+                showImageDialog = false
+            }
+        }
+
     }
 }
 
