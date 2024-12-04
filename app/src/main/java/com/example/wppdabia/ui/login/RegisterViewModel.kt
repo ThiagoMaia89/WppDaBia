@@ -8,8 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.wppdabia.data.UserData
 import com.example.wppdabia.data.data_store.PreferencesManager
 import com.example.wppdabia.network.Remote
-import com.example.wppdabia.network.RemoteImpl
-import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

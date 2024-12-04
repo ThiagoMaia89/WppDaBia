@@ -42,7 +42,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.wppdabia.R
 import com.example.wppdabia.data.data_store.PreferencesManager
-import com.example.wppdabia.network.Remote
 import com.example.wppdabia.network.RemoteImpl
 import com.example.wppdabia.ui.login.RegisterViewModel
 import com.example.wppdabia.ui.theme.WppDaBiaTheme

@@ -1,5 +1,9 @@
 package com.example.wppdabia.domain.utils
 
+import android.Manifest
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
@@ -10,13 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
-import android.Manifest
-import android.app.Activity
-import android.content.Context
-import android.content.Intent
-import androidx.activity.ComponentActivity
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.yalantis.ucrop.UCrop
 import java.io.File
 
@@ -28,7 +25,7 @@ class ImageHandler(
 ) {
     lateinit var cameraLauncher: ActivityResultLauncher<Void?>
     lateinit var galleryLauncher: ActivityResultLauncher<String>
-    lateinit var cropLauncher: ActivityResultLauncher<Intent>
+    private lateinit var cropLauncher: ActivityResultLauncher<Intent>
 
     @Composable
     fun InitializeLaunchers() {

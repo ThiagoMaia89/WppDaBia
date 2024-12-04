@@ -2,7 +2,6 @@ package com.example.wppdabia.ui.messages
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -137,6 +135,7 @@ fun MessageScreen(
         ) {
             items(messages) { message ->
                 val isSentByUser = message.sender.uid != contactId
+                viewModel.setMessageAsRead(chatId)
                 MessageView(messageData = message, isSentByUser = isSentByUser)
             }
         }

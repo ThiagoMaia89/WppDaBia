@@ -15,10 +15,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,20 +29,33 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.wppdabia.data.ContactData
+import com.example.wppdabia.data.MessageData
 import com.example.wppdabia.ui.components.dialog.ImageDialog
 import com.example.wppdabia.ui.extensions.getInitials
+import com.example.wppdabia.ui.extensions.handleTimeStamp
 import com.example.wppdabia.ui.theme.Typography
 import com.example.wppdabia.ui.theme.WppDaBiaTheme
+import kotlinx.coroutines.delay
 
 @Composable
 fun LastMessageCardView(contact: ContactData, onClick: () -> Unit) {
 
     var showImageDialog by remember { mutableStateOf(false) }
+
+    var formattedTimestamp by remember { mutableStateOf(handleTimeStamp(contact.timestamp)) }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(60000)
+            formattedTimestamp = handleTimeStamp(contact.timestamp)
+        }
+    }
 
     Column {
         Row(
@@ -99,7 +114,7 @@ fun LastMessageCardView(contact: ContactData, onClick: () -> Unit) {
                     )
                 )
                 Text(
-                    text = contact.lastMessage,
+                    text = contact.lastMessage?.lastMessage ?: "",
                     style = Typography.bodySmall.copy(
                         fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -110,13 +125,24 @@ fun LastMessageCardView(contact: ContactData, onClick: () -> Unit) {
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.CenterEnd
             ) {
-                Text(
-                    text = contact.timestamp,
-                    style = Typography.bodySmall.copy(
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = formattedTimestamp,
+                        style = Typography.bodySmall.copy(
+                            fontSize = 12.sp,
+                            color = if (contact.wasRead) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.primary,
+                            fontWeight = if (contact.wasRead) FontWeight.Normal else FontWeight.Bold
+                        )
                     )
-                )
+                    if (!contact.wasRead) {
+                        Box(
+                            modifier = Modifier.size(16.dp).background(
+                                color = MaterialTheme.colorScheme.primary,
+                                shape = CircleShape
+                            )
+                        )
+                    }
+                }
             }
         }
         Spacer(modifier = Modifier.fillMaxWidth().height(1.dp).background(color = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)))
@@ -139,8 +165,8 @@ private fun HomeMessageCardViewPreview() {
                 ContactData(
                     name = "Thiago Maia",
                     profileImageUrl = null,
-                    timestamp = "12:00",
-                    lastMessage = "Oi filhota!"
+                    timestamp = "12:00 - 04/12/2024",
+                    lastMessage = MessageData(lastMessage = "Oi filhota!")
                 )
             ) {}
         }

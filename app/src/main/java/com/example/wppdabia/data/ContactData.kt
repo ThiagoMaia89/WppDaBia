@@ -5,7 +5,8 @@ data class ContactData(
     val name: String = "",
     val email: String = "",
     val profileImageUrl: String? = null,
-    val lastMessage: String = "",
+    val lastMessage: MessageData? = MessageData(),
     val timestamp: String = "",
-    val chatId: String? = null
+    val chatId: String? = null,
+    val wasRead: Boolean = false
 )

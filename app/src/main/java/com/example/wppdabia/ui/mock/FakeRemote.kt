@@ -56,6 +56,10 @@ val fakeRemote = object : Remote {
         TODO("Not yet implemented")
     }
 
+    override suspend fun markMessagesAsRead(chatId: String, currentUserId: String) {
+        TODO("Not yet implemented")
+    }
+
     override fun logout() {
         TODO("Not yet implemented")
     }

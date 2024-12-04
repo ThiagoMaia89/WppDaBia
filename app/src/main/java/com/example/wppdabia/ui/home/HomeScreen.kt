@@ -56,8 +56,9 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
             } else {
                 LazyColumn {
                     itemsIndexed(lastMessages) { _, contact ->
+                        val wasRead = if (contact.lastMessage?.sender?.uid == currentUser?.uid) true else contact.wasRead
                         LastMessageCardView(
-                            contact = contact,
+                            contact = contact.copy(wasRead = wasRead),
                             onClick = {
                                 navController.navigate("messages/${contact.chatId}/${contact.id}/${contact.name}")
                             }

@@ -50,6 +50,14 @@ class MessageViewModel @Inject constructor(private val remote: Remote) : ViewMod
         viewModelScope.launch { remote.sendMessage(chatId, newMessage) }
     }
 
+    fun setMessageAsRead(chatId: String) {
+        if (currentUser.value?.uid != null) {
+            viewModelScope.launch {
+                remote.markMessagesAsRead(chatId, currentUser.value?.uid!!)
+            }
+        }
+    }
+
     private suspend fun getCurrentUser() {
         remote.getCurrentUser(
             onSuccess = { userData ->

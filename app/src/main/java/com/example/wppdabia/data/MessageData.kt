@@ -6,5 +6,6 @@ data class MessageData(
     val content: String = "",
     val timestamp: String = "",
     val isSentByUser: Boolean = false,
-    val lastMessage: String = ""
+    val lastMessage: String = "",
+    var wasRead: Boolean = false
 )

@@ -188,9 +188,10 @@ class RemoteImpl : Remote {
                                                     name = contactName,
                                                     email = email ?: "",
                                                     profileImageUrl = contactImage ?: "",
-                                                    lastMessage = lastMessage.content,
+                                                    lastMessage = lastMessage,
                                                     timestamp = lastMessage.timestamp,
-                                                    chatId = chatId
+                                                    chatId = chatId,
+                                                    wasRead = lastMessage.wasRead
                                                 )
                                             )
 
@@ -248,6 +249,21 @@ class RemoteImpl : Remote {
             .addOnFailureListener { e ->
                 onError("Erro ao fazer upload da imagem: ${e.message}")
             }
+    }
+
+    override suspend fun markMessagesAsRead(chatId: String, currentUserId: String) {
+        val chatRef = database.getReference("chats/$chatId")
+
+        chatRef.get().addOnSuccessListener { snapshot ->
+            for (messageSnapshot in snapshot.children) {
+                val message = messageSnapshot.getValue(MessageData::class.java)
+                val messageKey = messageSnapshot.key
+
+                if (message != null && !message.wasRead && message.sender.uid != currentUserId) {
+                    chatRef.child(messageKey!!).child("wasRead").setValue(true)
+                }
+            }
+        }
     }
 
     override fun logout() {
