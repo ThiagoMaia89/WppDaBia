@@ -5,62 +5,53 @@ import com.example.wppdabia.data.MessageData
 import com.example.wppdabia.data.UserData
 import com.example.wppdabia.repository.Repository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 val fakeRepository = object : Repository {
     override suspend fun registerUser(
         userData: UserData,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
-    ) {
-        onSuccess()
-    }
+    ) {}
 
     override fun loginUser(
         userData: UserData,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
-    ) {
-        onSuccess()
-    }
+    ) {}
 
     override suspend fun getAllContacts(
         onSuccess: (List<ContactData>) -> Unit,
         onError: (String) -> Unit
-    ) { }
+    ) {}
 
-    override suspend fun getCurrentUser(onSuccess: (UserData?) -> Unit, onError: (String) -> Unit) {
-        TODO("Not yet implemented")
-    }
+    override suspend fun getCurrentUser(onSuccess: (UserData?) -> Unit, onError: (String) -> Unit) {}
 
-    override suspend fun sendMessage(chatId: String, message: MessageData) {
-        TODO("Not yet implemented")
-    }
+    override suspend fun sendMessage(chatId: String, message: MessageData) {}
 
     override suspend fun fetchMessages(chatId: String): Flow<List<MessageData>> {
-        TODO("Not yet implemented")
+        return flowOf()
     }
 
     override suspend fun getAllChats(
         currentUserUid: String,
         onSuccess: (List<ContactData>) -> Unit,
         onError: (String) -> Unit
-    ) {
-        TODO("Not yet implemented")
-    }
+    ) {}
 
     override suspend fun updateProfileImage(
         newImageUrl: String,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
-    ) {
-        TODO("Not yet implemented")
-    }
+    ) {}
 
-    override suspend fun markMessagesAsRead(chatId: String, currentUserId: String) {
-        TODO("Not yet implemented")
-    }
+    override suspend fun markMessagesAsRead(chatId: String, currentUserId: String) {}
 
-    override fun logout() {
-        TODO("Not yet implemented")
-    }
+    override suspend fun deletePhoto(
+        userId: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {}
+
+    override fun logout() {}
 }

@@ -30,6 +30,10 @@ class RegisterViewModel @Inject constructor(private val preferencesManager: Pref
         _capturedImageUri.value = uri.toString()
     }
 
+    fun removeCapturedImage() {
+        if (_capturedImageUri.value != null) _capturedImageUri.value = null
+    }
+
     suspend fun registerUser(
         userData: UserData,
         onSuccess: () -> Unit,

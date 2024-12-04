@@ -21,8 +21,10 @@ import com.example.wppdabia.ui.theme.WppDaBiaTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChooseImageBottomSheet(
+    removePhotoEnabled: Boolean = false,
     onCameraClick: () -> Unit,
     onGalleryClick: () -> Unit,
+    onDeleteClick: () -> Unit,
     onDismiss: () -> Unit
 ) {
 
@@ -31,16 +33,20 @@ fun ChooseImageBottomSheet(
         dragHandle = { BottomSheetDefaults.DragHandle(color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))}
     ) {
         ChooseImageBottomSheetContent(
+            removePhotoEnabled = removePhotoEnabled,
             onCameraClick = onCameraClick,
-            onGalleryClick = onGalleryClick
+            onGalleryClick = onGalleryClick,
+            onDeleteClick = onDeleteClick
         )
     }
 }
 
 @Composable
 private fun ChooseImageBottomSheetContent(
+    removePhotoEnabled: Boolean = false,
     onCameraClick: () -> Unit,
-    onGalleryClick: () -> Unit
+    onGalleryClick: () -> Unit,
+    onDeleteClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -67,6 +73,15 @@ private fun ChooseImageBottomSheetContent(
             text = "Acessar galeria",
             icon = R.drawable.ic_gallery
         )
+        Spacer(modifier = Modifier.height(4.dp))
+        BottomSheetButton(
+            onClick = {
+                onDeleteClick.invoke()
+            },
+            enabled = removePhotoEnabled,
+            text = "Remover foto",
+            icon = R.drawable.ic_delete_photo
+        )
     }
 }
 
@@ -76,7 +91,8 @@ private fun ChooseImageBottomSheetPreview() {
     WppDaBiaTheme {
         ChooseImageBottomSheetContent(
             onCameraClick = {},
-            onGalleryClick = {}
+            onGalleryClick = {},
+            onDeleteClick = {}
         )
     }
 }

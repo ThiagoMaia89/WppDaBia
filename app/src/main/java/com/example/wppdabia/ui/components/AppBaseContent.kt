@@ -31,6 +31,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -114,6 +115,7 @@ fun WppDaBiaTopBar(
     var permissionDeniedToast by remember { mutableStateOf(false) }
     var cropErrorToast by remember { mutableStateOf(false) }
     var showImageDialog by remember { mutableStateOf(false) }
+    val errorMessage = sharedViewModel.errorMessage.observeAsState().value
 
     imageHandler = remember {
         ImageHandler(
@@ -292,6 +294,7 @@ fun WppDaBiaTopBar(
                             ) {
                                 IconButton(
                                     onClick = {
+                                        showMenu = false
                                         showPhotoBottomSheet = true
                                     },
                                 ) {
@@ -342,10 +345,14 @@ fun WppDaBiaTopBar(
 
             if (showPhotoBottomSheet) {
                 ChooseImageBottomSheet(
+                    removePhotoEnabled = user?.profileImageUrl != null,
                     onCameraClick = {
                         requestPermission = true
                     },
                     onGalleryClick = { imageHandler.galleryLauncher.launch("image/*") },
+                    onDeleteClick = {
+                        sharedViewModel.deleteProfilePhoto()
+                    },
                     onDismiss = { showPhotoBottomSheet = false }
                 )
             }
@@ -354,6 +361,10 @@ fun WppDaBiaTopBar(
                 ImageDialog(
                     imageUrl = user?.profileImageUrl,
                     onDismissRequest = { showImageDialog = false })
+            }
+
+            if (!errorMessage.isNullOrEmpty()) {
+                Toast.makeText(LocalContext.current, errorMessage, Toast.LENGTH_SHORT).show()
             }
         },
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(

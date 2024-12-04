@@ -6,6 +6,7 @@ import com.example.wppdabia.data.MessageData
 import com.example.wppdabia.data.UserData
 import com.example.wppdabia.repository.FirebasePathConstants.CHATS
 import com.example.wppdabia.repository.FirebasePathConstants.CREATE_USER_ERROR
+import com.example.wppdabia.repository.FirebasePathConstants.DELETE_IMAGE_ERROR
 import com.example.wppdabia.repository.FirebasePathConstants.EMAIL
 import com.example.wppdabia.repository.FirebasePathConstants.NAME
 import com.example.wppdabia.repository.FirebasePathConstants.OBTAIN_IMAGE_ERROR
@@ -277,6 +278,22 @@ class RepositoryImpl : Repository {
                 }
             }
         }
+    }
+
+    override suspend fun deletePhoto(
+        userId: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val photoRef = storage.reference.child("$PROFILE_IMAGES/$userId.jpg")
+
+        photoRef.delete()
+            .addOnSuccessListener {
+                FirebaseDatabase.getInstance().getReference("$USERS/$userId/$PROFILE_IMAGE_URL").removeValue()
+                    .addOnSuccessListener { onSuccess() }
+                    .addOnFailureListener { onError(DELETE_IMAGE_ERROR) }
+            }
+            .addOnFailureListener { onError(DELETE_IMAGE_ERROR) }
     }
 
     override fun logout() {

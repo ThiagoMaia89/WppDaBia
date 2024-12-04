@@ -369,10 +369,15 @@ fun RegisterScreen(
     }
     if (showPhotoBottomSheet) {
         ChooseImageBottomSheet(
+            removePhotoEnabled = imageUrl != null,
             onCameraClick = {
                 requestPermission = true
             },
             onGalleryClick = { imageHandler.galleryLauncher.launch("image/*") },
+            onDeleteClick = {
+                viewModel.removeCapturedImage()
+                showPhotoBottomSheet = false
+            },
             onDismiss = { showPhotoBottomSheet = false }
         )
     }
@@ -412,7 +417,10 @@ fun RegisterScreenPreview() {
     ) {
         RegisterScreen(
             rememberNavController(),
-            RegisterViewModel(PreferencesManager(LocalContext.current), repository = fakeRepository),
+            RegisterViewModel(
+                PreferencesManager(LocalContext.current),
+                repository = fakeRepository
+            ),
             onLogin = {}
         )
     }

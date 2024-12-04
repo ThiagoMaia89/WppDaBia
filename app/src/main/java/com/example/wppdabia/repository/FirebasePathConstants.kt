@@ -17,5 +17,6 @@ object FirebasePathConstants {
     const val USER_NOT_AUTHENTICATED_ERROR = "Usuário não autenticado"
     const val SAVE_IMAGE_ERROR = "Erro ao salvar imagem"
     const val OBTAIN_IMAGE_ERROR = "Erro ao obter imagem"
+    const val DELETE_IMAGE_ERROR = "Erro ao deletar imagem"
     const val UNKNOWN_ERROR = "Erro desconhecido"
 }

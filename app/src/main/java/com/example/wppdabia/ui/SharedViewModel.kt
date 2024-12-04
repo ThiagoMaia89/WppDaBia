@@ -24,7 +24,8 @@ class SharedViewModel @Inject constructor(
     val currentUser: StateFlow<UserData?> = _currentUser
 
     private var _capturedImageUri = MutableLiveData<String?>()
-    val capturedImageUri: LiveData<String?> = _capturedImageUri
+
+    var errorMessage = MutableLiveData<String>()
 
     var logout = MutableLiveData(false)
 
@@ -59,6 +60,21 @@ class SharedViewModel @Inject constructor(
                     onError.invoke(it)
                 }
             )
+        }
+    }
+
+    fun deleteProfilePhoto() {
+        viewModelScope.launch {
+            _currentUser.value?.uid?.let { userId ->
+                repository.deletePhoto(
+                    userId = userId,
+                    onSuccess = {
+                        _currentUser.value = _currentUser.value?.copy(profileImageUrl = null)
+                        _capturedImageUri.value = null
+                    },
+                    onError = { errorMessage.value = it }
+                )
+            }
         }
     }
 

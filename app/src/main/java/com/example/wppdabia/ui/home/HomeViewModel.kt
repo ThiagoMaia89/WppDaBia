@@ -18,7 +18,7 @@ class HomeViewModel @Inject constructor(private val repository: Repository) : Vi
     private val _lastMessageCardViews = MutableStateFlow<List<ContactData>>(emptyList())
     val lastMessageCardViews: StateFlow<List<ContactData>> = _lastMessageCardViews
 
-    var errorMessage = MutableLiveData<String>()
+    private var errorMessage = MutableLiveData<String>()
 
     private val _currentUser = MutableStateFlow<UserData?>(UserData())
     val currentUser: StateFlow<UserData?> = _currentUser

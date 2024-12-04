@@ -26,13 +26,15 @@ import com.example.wppdabia.ui.theme.WppDaBiaTheme
 fun BottomSheetButton(
     onClick: () -> Unit,
     text: String,
-    icon: Int
+    icon: Int,
+    enabled: Boolean = true
 ) {
     Button(
         modifier = Modifier
             .fillMaxWidth(),
         shape = MaterialTheme.shapes.small,
-        border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary),
+        border = BorderStroke(width = 1.dp, color = if (enabled) MaterialTheme.colorScheme.primary else Color.Transparent),
+        enabled = enabled,
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.White,
             contentColor = MaterialTheme.colorScheme.primary

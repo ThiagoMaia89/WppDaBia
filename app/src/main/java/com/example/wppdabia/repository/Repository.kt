@@ -25,5 +25,7 @@ interface Repository {
 
     suspend fun markMessagesAsRead(chatId: String, currentUserId: String)
 
+    suspend fun deletePhoto(userId: String, onSuccess: () -> Unit, onError: (String) -> Unit)
+
     fun logout()
 }
