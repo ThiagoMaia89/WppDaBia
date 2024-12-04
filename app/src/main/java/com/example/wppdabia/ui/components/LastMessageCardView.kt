@@ -39,6 +39,7 @@ import com.example.wppdabia.data.MessageData
 import com.example.wppdabia.ui.components.dialog.ImageDialog
 import com.example.wppdabia.ui.extensions.getInitials
 import com.example.wppdabia.ui.extensions.handleTimeStamp
+import com.example.wppdabia.ui.extensions.ignoreLineBreak
 import com.example.wppdabia.ui.theme.Typography
 import com.example.wppdabia.ui.theme.WppDaBiaTheme
 import kotlinx.coroutines.delay
@@ -114,7 +115,7 @@ fun LastMessageCardView(contact: ContactData, onClick: () -> Unit) {
                     )
                 )
                 Text(
-                    text = contact.lastMessage?.lastMessage ?: "",
+                    text = contact.lastMessage?.lastMessage?.ignoreLineBreak() ?: "",
                     style = Typography.bodySmall.copy(
                         fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant

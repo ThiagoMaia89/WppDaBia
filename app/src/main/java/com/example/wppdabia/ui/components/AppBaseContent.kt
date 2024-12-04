@@ -37,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -220,8 +221,8 @@ fun WppDaBiaTopBar(
 
                 DropdownMenu(
                     modifier = Modifier
-                        .background(color = MaterialTheme.colorScheme.primary)
-                        .border(width = 1.dp, color = Color.White),
+                        .background(color = MaterialTheme.colorScheme.background)
+                        .shadow(elevation = 1.dp),
                     expanded = showMenu,
                     onDismissRequest = { showMenu = false }
                 ) {
@@ -236,7 +237,7 @@ fun WppDaBiaTopBar(
                                 .wrapContentWidth()
                                 .size(100.dp)
                                 .background(
-                                    color = MaterialTheme.colorScheme.tertiary,
+                                    color = MaterialTheme.colorScheme.primary,
                                     shape = RoundedCornerShape(180.dp)
                                 ),
                             contentAlignment = Alignment.Center
@@ -310,7 +311,7 @@ fun WppDaBiaTopBar(
                                 .wrapContentHeight()
                                 .border(
                                     width = 1.dp,
-                                    color = MaterialTheme.colorScheme.onPrimary,
+                                    color = MaterialTheme.colorScheme.primary,
                                     shape = RoundedCornerShape(8.dp)
                                 )
                                 .padding(4.dp)
@@ -322,7 +323,7 @@ fun WppDaBiaTopBar(
                         ) {
                             Text(
                                 text = "Logout",
-                                style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onTertiary)
+                                style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.primary)
                             )
                         }
                     }

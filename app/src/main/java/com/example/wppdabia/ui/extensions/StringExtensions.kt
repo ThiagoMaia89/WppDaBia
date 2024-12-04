@@ -65,3 +65,15 @@ fun handleTimeStamp(timestamp: String): String {
         }
     }
 }
+
+fun String.getHourFromTimeStamp(): String {
+    return this.split(" - ").firstOrNull() ?: this
+}
+
+fun String.getDateFromTimeStamp(): String {
+    return this.split(" - ").lastOrNull() ?: this
+}
+
+fun String.ignoreLineBreak(): String {
+    return this.replace("\\r?\\n".toRegex(), " ")
+}
