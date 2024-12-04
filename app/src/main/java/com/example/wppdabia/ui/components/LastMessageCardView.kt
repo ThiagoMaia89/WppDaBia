@@ -114,8 +114,13 @@ fun LastMessageCardView(contact: ContactData, onClick: () -> Unit) {
                         fontSize = 16.sp
                     )
                 )
+                val textHandled = if (contact.lastMessage?.sender?.uid != contact.id) {
+                    "Você: ${contact.lastMessage?.lastMessage?.ignoreLineBreak()}"
+                } else {
+                    contact.lastMessage.lastMessage.ignoreLineBreak()
+                }
                 Text(
-                    text = contact.lastMessage?.lastMessage?.ignoreLineBreak() ?: "",
+                    text = textHandled ?: "",
                     style = Typography.bodySmall.copy(
                         fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -137,16 +142,21 @@ fun LastMessageCardView(contact: ContactData, onClick: () -> Unit) {
                     )
                     if (!contact.wasRead) {
                         Box(
-                            modifier = Modifier.size(16.dp).background(
-                                color = MaterialTheme.colorScheme.primary,
-                                shape = CircleShape
-                            )
+                            modifier = Modifier
+                                .size(16.dp)
+                                .background(
+                                    color = MaterialTheme.colorScheme.primary,
+                                    shape = CircleShape
+                                )
                         )
                     }
                 }
             }
         }
-        Spacer(modifier = Modifier.fillMaxWidth().height(1.dp).background(color = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)))
+        Spacer(modifier = Modifier
+            .fillMaxWidth()
+            .height(1.dp)
+            .background(color = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)))
 
         if (showImageDialog) {
             ImageDialog(contact.profileImageUrl) {
