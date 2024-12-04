@@ -4,6 +4,20 @@ import androidx.core.net.toUri
 import com.example.wppdabia.data.ContactData
 import com.example.wppdabia.data.MessageData
 import com.example.wppdabia.data.UserData
+import com.example.wppdabia.repository.FirebasePathConstants.CHATS
+import com.example.wppdabia.repository.FirebasePathConstants.CREATE_USER_ERROR
+import com.example.wppdabia.repository.FirebasePathConstants.EMAIL
+import com.example.wppdabia.repository.FirebasePathConstants.NAME
+import com.example.wppdabia.repository.FirebasePathConstants.OBTAIN_IMAGE_ERROR
+import com.example.wppdabia.repository.FirebasePathConstants.PROFILE_IMAGES
+import com.example.wppdabia.repository.FirebasePathConstants.PROFILE_IMAGE_URL
+import com.example.wppdabia.repository.FirebasePathConstants.SAVE_DATA_ERROR
+import com.example.wppdabia.repository.FirebasePathConstants.SAVE_IMAGE_ERROR
+import com.example.wppdabia.repository.FirebasePathConstants.UNKNOWN_ERROR
+import com.example.wppdabia.repository.FirebasePathConstants.UPLOAD_IMAGE_ERROR
+import com.example.wppdabia.repository.FirebasePathConstants.USERS
+import com.example.wppdabia.repository.FirebasePathConstants.USER_NOT_AUTHENTICATED_ERROR
+import com.example.wppdabia.repository.FirebasePathConstants.WAS_READ
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -30,47 +44,47 @@ class RepositoryImpl : Repository {
                 val userId = authResult.user?.uid ?: return@addOnSuccessListener
 
                 if (userData.profileImageUrl != null) {
-                    val storageRef = storage.reference.child("profile_images/$userId.jpg")
+                    val storageRef = storage.reference.child("$PROFILE_IMAGES/$userId.jpg")
                     storageRef.putFile(userData.profileImageUrl.toUri())
                         .addOnSuccessListener {
                             storageRef.downloadUrl.addOnSuccessListener { downloadUri ->
                                 val user = mapOf(
-                                    "name" to userData.name,
-                                    "email" to userData.email,
-                                    "profileImageUrl" to downloadUri.toString()
+                                    NAME to userData.name,
+                                    EMAIL to userData.email,
+                                    PROFILE_IMAGE_URL to downloadUri.toString()
                                 )
 
-                                database.reference.child("users").child(userId)
+                                database.reference.child(USERS).child(userId)
                                     .setValue(user)
                                     .addOnSuccessListener {
                                         onSuccess()
                                     }
-                                    .addOnFailureListener { e ->
-                                        onError("Erro ao salvar dados: ${e.message}")
+                                    .addOnFailureListener {
+                                        onError(SAVE_DATA_ERROR)
                                     }
                             }
                         }
-                        .addOnFailureListener { e ->
-                            onError("Erro ao fazer upload da imagem: ${e.message}")
+                        .addOnFailureListener {
+                            onError(UPLOAD_IMAGE_ERROR)
                         }
                 } else {
                     val user = mapOf(
-                        "name" to userData.name,
-                        "email" to userData.email
+                        NAME to userData.name,
+                        EMAIL to userData.email
                     )
 
-                    database.reference.child("users").child(userId)
+                    database.reference.child(USERS).child(userId)
                         .setValue(user)
                         .addOnSuccessListener {
                             onSuccess()
                         }
-                        .addOnFailureListener { e ->
-                            onError("Erro ao salvar dados: ${e.message}")
+                        .addOnFailureListener {
+                            onError(SAVE_DATA_ERROR)
                         }
                 }
             }
-            .addOnFailureListener { e ->
-                onError("Erro ao criar usuário: ${e.message}")
+            .addOnFailureListener {
+                onError(CREATE_USER_ERROR)
             }
     }
 
@@ -80,7 +94,7 @@ class RepositoryImpl : Repository {
                 if (task.isSuccessful) {
                     onSuccess()
                 } else {
-                    onError(task.exception?.localizedMessage ?: "Erro desconhecido")
+                    onError(task.exception?.localizedMessage ?: UNKNOWN_ERROR)
                 }
             }
     }
@@ -89,7 +103,7 @@ class RepositoryImpl : Repository {
         onSuccess: (List<ContactData>) -> Unit,
         onError: (String) -> Unit
     ) {
-        database.reference.child("users")
+        database.reference.child(USERS)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val userList = mutableListOf<ContactData>()
@@ -114,7 +128,7 @@ class RepositoryImpl : Repository {
         val currentUser = auth.currentUser
 
         if (currentUser != null) {
-            val reference = database.getReference("users").child(currentUser.uid)
+            val reference = database.getReference(USERS).child(currentUser.uid)
             reference.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val user = snapshot.getValue(UserData::class.java)?.copy(uid = currentUser.uid)
@@ -129,12 +143,12 @@ class RepositoryImpl : Repository {
     }
 
     override suspend fun sendMessage(chatId: String, message: MessageData) {
-        val chatRef = database.getReference("chats/$chatId")
+        val chatRef = database.getReference("$CHATS/$chatId")
         chatRef.push().setValue(message)
     }
 
     override suspend fun fetchMessages(chatId: String): Flow<List<MessageData>> {
-        val chatRef = database.getReference("chats/$chatId")
+        val chatRef = database.getReference("$CHATS/$chatId")
         return callbackFlow {
             val listener = object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
@@ -158,7 +172,7 @@ class RepositoryImpl : Repository {
         onSuccess: (List<ContactData>) -> Unit,
         onError: (String) -> Unit
     ) {
-        val databaseRef = database.reference.child("chats")
+        val databaseRef = database.reference.child(CHATS)
 
         databaseRef.orderByKey()
             .addValueEventListener(object : ValueEventListener {
@@ -175,12 +189,12 @@ class RepositoryImpl : Repository {
                             if (lastMessage != null) {
                                 val contactUid = chatId.replace(currentUserUid, "").replace("-", "")
 
-                                database.reference.child("users").child(contactUid)
+                                database.reference.child(USERS).child(contactUid)
                                     .addListenerForSingleValueEvent(object : ValueEventListener {
                                         override fun onDataChange(contactSnapshot: DataSnapshot) {
-                                            val contactName = contactSnapshot.child("name").value as? String ?: "Desconhecido"
-                                            val contactImage = contactSnapshot.child("profileImageUrl").value as? String
-                                            val email = contactSnapshot.child("email").value as? String
+                                            val contactName = contactSnapshot.child(NAME).value as? String ?: ":("
+                                            val contactImage = contactSnapshot.child(PROFILE_IMAGE_URL).value as? String
+                                            val email = contactSnapshot.child(EMAIL).value as? String
 
                                             chatPreviews.add(
                                                 ContactData(
@@ -223,36 +237,35 @@ class RepositoryImpl : Repository {
     ) {
         val currentUser = auth.currentUser
         if (currentUser == null) {
-            onError("Usuário não autenticado.")
+            onError(USER_NOT_AUTHENTICATED_ERROR)
             return
         }
         val userId = currentUser.uid
-        val storageRef = storage.reference.child("profile_images/$userId.jpg")
+        val storageRef = storage.reference.child("$PROFILE_IMAGES/$userId.jpg")
 
         storageRef.putFile(newImageUrl.toUri())
             .addOnSuccessListener {
-
                 storageRef.downloadUrl.addOnSuccessListener { downloadUri ->
-                    database.reference.child("users").child(userId)
-                        .child("profileImageUrl")
+                    database.reference.child(USERS).child(userId)
+                        .child(PROFILE_IMAGE_URL)
                         .setValue(downloadUri.toString())
                         .addOnSuccessListener {
                             onSuccess()
                         }
-                        .addOnFailureListener { e ->
-                            onError("Erro ao salvar URL no banco de dados: ${e.message}")
+                        .addOnFailureListener {
+                            onError(SAVE_IMAGE_ERROR)
                         }
-                }.addOnFailureListener { e ->
-                    onError("Erro ao obter URL da imagem: ${e.message}")
+                }.addOnFailureListener {
+                    onError(OBTAIN_IMAGE_ERROR)
                 }
             }
-            .addOnFailureListener { e ->
-                onError("Erro ao fazer upload da imagem: ${e.message}")
+            .addOnFailureListener {
+                onError(UPLOAD_IMAGE_ERROR)
             }
     }
 
     override suspend fun markMessagesAsRead(chatId: String, currentUserId: String) {
-        val chatRef = database.getReference("chats/$chatId")
+        val chatRef = database.getReference("$CHATS/$chatId")
 
         chatRef.get().addOnSuccessListener { snapshot ->
             for (messageSnapshot in snapshot.children) {
@@ -260,7 +273,7 @@ class RepositoryImpl : Repository {
                 val messageKey = messageSnapshot.key
 
                 if (message != null && !message.wasRead && message.sender.uid != currentUserId) {
-                    chatRef.child(messageKey!!).child("wasRead").setValue(true)
+                    chatRef.child(messageKey!!).child(WAS_READ).setValue(true)
                 }
             }
         }
