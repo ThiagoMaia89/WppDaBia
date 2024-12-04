@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.wppdabia.data.UserData
 import com.example.wppdabia.data.data_store.PreferencesManager
-import com.example.wppdabia.network.Remote
+import com.example.wppdabia.repository.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SharedViewModel @Inject constructor(
-    private val remote: Remote,
+    private val repository: Repository,
     private val preferencesManager: PreferencesManager
 ) : ViewModel() {
 
@@ -29,7 +29,7 @@ class SharedViewModel @Inject constructor(
     var logout = MutableLiveData(false)
 
     suspend fun getCurrentUser() {
-        remote.getCurrentUser(
+        repository.getCurrentUser(
             onSuccess = { userData ->
                 _currentUser.value = userData
             },
@@ -49,7 +49,7 @@ class SharedViewModel @Inject constructor(
         onError: (String) -> Unit
     ) {
         viewModelScope.launch {
-            remote.updateProfileImage(
+            repository.updateProfileImage(
                 newImageUrl,
                 onSuccess = {
                     _currentUser.value = _currentUser.value?.copy(profileImageUrl = newImageUrl)
@@ -63,7 +63,7 @@ class SharedViewModel @Inject constructor(
     }
 
     fun logout() {
-        remote.logout()
+        repository.logout()
         viewModelScope.launch { preferencesManager.saveIsRegistered(false) }
         logout.value = true
     }

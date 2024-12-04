@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.wppdabia.data.MessageData
 import com.example.wppdabia.data.UserData
-import com.example.wppdabia.network.Remote
+import com.example.wppdabia.repository.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,7 +16,7 @@ import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
-class MessageViewModel @Inject constructor(private val remote: Remote) : ViewModel() {
+class MessageViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
 
     private val _messages = MutableStateFlow<List<MessageData>>(emptyList())
     val messages: StateFlow<List<MessageData>> = _messages
@@ -31,7 +31,7 @@ class MessageViewModel @Inject constructor(private val remote: Remote) : ViewMod
 
     fun fetchMessages(chatId: String) {
         viewModelScope.launch {
-            remote.fetchMessages(chatId = chatId).collect { fetchedMessages ->
+            repository.fetchMessages(chatId = chatId).collect { fetchedMessages ->
                 _messages.value = fetchedMessages
             }
         }
@@ -47,19 +47,19 @@ class MessageViewModel @Inject constructor(private val remote: Remote) : ViewMod
             isSentByUser = _isSentByUser.value,
             lastMessage = lastMessage
         )
-        viewModelScope.launch { remote.sendMessage(chatId, newMessage) }
+        viewModelScope.launch { repository.sendMessage(chatId, newMessage) }
     }
 
     fun setMessageAsRead(chatId: String) {
         if (currentUser.value?.uid != null) {
             viewModelScope.launch {
-                remote.markMessagesAsRead(chatId, currentUser.value?.uid!!)
+                repository.markMessagesAsRead(chatId, currentUser.value?.uid!!)
             }
         }
     }
 
     private suspend fun getCurrentUser() {
-        remote.getCurrentUser(
+        repository.getCurrentUser(
             onSuccess = { userData ->
                 currentUser.value = userData
             },

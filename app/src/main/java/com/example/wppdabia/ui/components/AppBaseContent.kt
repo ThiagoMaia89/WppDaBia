@@ -57,7 +57,7 @@ import com.example.wppdabia.ui.components.bottomsheet.ChooseImageBottomSheet
 import com.example.wppdabia.ui.components.dialog.ImageDialog
 import com.example.wppdabia.ui.extensions.getInitials
 import com.example.wppdabia.ui.extensions.toUri
-import com.example.wppdabia.ui.mock.fakeRemote
+import com.example.wppdabia.ui.mock.fakeRepository
 import com.example.wppdabia.ui.theme.Typography
 import com.example.wppdabia.ui.theme.WppDaBiaTheme
 
@@ -371,7 +371,7 @@ fun WppDaBiaTopBarPreview() {
         onBackClick = {},
         user = UserData(name = "Thiago Maia"),
         sharedViewModel = SharedViewModel(
-            fakeRemote,
+            fakeRepository,
             PreferencesManager(LocalContext.current)
         )
     )

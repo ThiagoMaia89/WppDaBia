@@ -31,7 +31,7 @@ import com.example.wppdabia.ui.components.AppBaseContent
 import com.example.wppdabia.ui.components.LastMessageCardView
 import com.example.wppdabia.ui.components.NoMessageAlert
 import com.example.wppdabia.ui.extensions.getFirstName
-import com.example.wppdabia.ui.mock.fakeRemote
+import com.example.wppdabia.ui.mock.fakeRepository
 import com.example.wppdabia.ui.navigation.Screen
 
 @Composable
@@ -93,12 +93,12 @@ fun HomeScreenPreview() {
     AppBaseContent(
         title = "Home",
         onBackClick = {},
-        sharedViewModel = SharedViewModel(fakeRemote, PreferencesManager(LocalContext.current))
+        sharedViewModel = SharedViewModel(fakeRepository, PreferencesManager(LocalContext.current))
     ) {
         HomeScreen(
             navController = rememberNavController(),
             viewModel = HomeViewModel(
-                remote = fakeRemote
+                repository = fakeRepository
             )
         )
     }

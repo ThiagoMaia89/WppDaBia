@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.wppdabia.data.ContactData
 import com.example.wppdabia.data.UserData
-import com.example.wppdabia.network.Remote
+import com.example.wppdabia.repository.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ContactsViewModel @Inject constructor(private val remote: Remote) : ViewModel() {
+class ContactsViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
     private val _contacts = MutableLiveData<List<ContactData>>()
     val contacts: LiveData<List<ContactData>> = _contacts
 
@@ -34,7 +34,7 @@ class ContactsViewModel @Inject constructor(private val remote: Remote) : ViewMo
     private fun getContacts() {
         _contactsLoading.value = true
         viewModelScope.launch {
-            remote.getAllContacts(
+            repository.getAllContacts(
                 onSuccess = { contactsList ->
                     _contactsLoading.value = false
                     _contacts.value = contactsList
@@ -48,7 +48,7 @@ class ContactsViewModel @Inject constructor(private val remote: Remote) : ViewMo
     }
 
     private suspend fun getCurrentUser() {
-        remote.getCurrentUser(
+        repository.getCurrentUser(
             onSuccess = { userData ->
                 currentUser.value = userData
             },

@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.wppdabia.R
 import com.example.wppdabia.data.data_store.PreferencesManager
-import com.example.wppdabia.network.RemoteImpl
+import com.example.wppdabia.repository.RepositoryImpl
 import com.example.wppdabia.ui.login.RegisterViewModel
 import com.example.wppdabia.ui.theme.WppDaBiaTheme
 
@@ -180,7 +180,7 @@ private fun LoginBottomSheetContent(
 private fun LoginBottomSheetPreview() {
     WppDaBiaTheme {
         LoginBottomSheetContent(
-            registerViewModel = RegisterViewModel(PreferencesManager(LocalContext.current), remote = RemoteImpl()),
+            registerViewModel = RegisterViewModel(PreferencesManager(LocalContext.current), repository = RepositoryImpl()),
             onLogin = ({ _, _ -> })
         )
     }

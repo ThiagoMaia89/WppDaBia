@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.wppdabia.data.UserData
 import com.example.wppdabia.data.data_store.PreferencesManager
-import com.example.wppdabia.network.Remote
+import com.example.wppdabia.repository.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class RegisterViewModel @Inject constructor(private val preferencesManager: PreferencesManager, private val remote: Remote) :
+class RegisterViewModel @Inject constructor(private val preferencesManager: PreferencesManager, private val repository: Repository) :
     ViewModel() {
     private var _capturedImageUri = MutableLiveData<String?>()
     val capturedImageUri: LiveData<String?> = _capturedImageUri
@@ -36,7 +36,7 @@ class RegisterViewModel @Inject constructor(private val preferencesManager: Pref
         onError: (String) -> Unit
     ) {
         _registerLoading.value = true
-        remote.registerUser(
+        repository.registerUser(
             userData = userData,
             onSuccess = {
                 _registerLoading.value = false
@@ -58,7 +58,7 @@ class RegisterViewModel @Inject constructor(private val preferencesManager: Pref
         onError: (String) -> Unit
     ) {
         _loginLoading.value = true
-        remote.loginUser(
+        repository.loginUser(
             userData = userData,
             onSuccess = {
                 _loginLoading.value = false

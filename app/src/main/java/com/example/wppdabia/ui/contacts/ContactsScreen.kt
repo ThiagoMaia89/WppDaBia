@@ -41,7 +41,7 @@ import com.example.wppdabia.data.data_store.PreferencesManager
 import com.example.wppdabia.ui.SharedViewModel
 import com.example.wppdabia.ui.components.AppBaseContent
 import com.example.wppdabia.ui.components.ContactCardView
-import com.example.wppdabia.ui.mock.fakeRemote
+import com.example.wppdabia.ui.mock.fakeRepository
 
 @Composable
 fun ContactsScreen(navController: NavController, viewModel: ContactsViewModel) {
@@ -137,8 +137,8 @@ fun ContactsScreenPreview() {
     AppBaseContent(
         title = "Contatos",
         onBackClick = {},
-        sharedViewModel = SharedViewModel(fakeRemote, PreferencesManager(LocalContext.current))
+        sharedViewModel = SharedViewModel(fakeRepository, PreferencesManager(LocalContext.current))
     ) {
-        ContactsScreen(rememberNavController(), ContactsViewModel(fakeRemote))
+        ContactsScreen(rememberNavController(), ContactsViewModel(fakeRepository))
     }
 }

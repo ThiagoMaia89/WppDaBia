@@ -67,7 +67,7 @@ import com.example.wppdabia.ui.components.bottomsheet.ChooseImageBottomSheet
 import com.example.wppdabia.ui.components.bottomsheet.LoginBottomSheet
 import com.example.wppdabia.ui.extensions.getInitials
 import com.example.wppdabia.ui.extensions.toUri
-import com.example.wppdabia.ui.mock.fakeRemote
+import com.example.wppdabia.ui.mock.fakeRepository
 import com.example.wppdabia.ui.navigation.Screen
 import com.example.wppdabia.ui.theme.Typography
 import kotlinx.coroutines.launch
@@ -408,11 +408,11 @@ fun RegisterScreenPreview() {
     AppBaseContent(
         title = "Cadastro",
         onBackClick = {},
-        sharedViewModel = SharedViewModel(fakeRemote, PreferencesManager(LocalContext.current))
+        sharedViewModel = SharedViewModel(fakeRepository, PreferencesManager(LocalContext.current))
     ) {
         RegisterScreen(
             rememberNavController(),
-            RegisterViewModel(PreferencesManager(LocalContext.current), remote = fakeRemote),
+            RegisterViewModel(PreferencesManager(LocalContext.current), repository = fakeRepository),
             onLogin = {}
         )
     }

@@ -3,10 +3,10 @@ package com.example.wppdabia.ui.mock
 import com.example.wppdabia.data.ContactData
 import com.example.wppdabia.data.MessageData
 import com.example.wppdabia.data.UserData
-import com.example.wppdabia.network.Remote
+import com.example.wppdabia.repository.Repository
 import kotlinx.coroutines.flow.Flow
 
-val fakeRemote = object : Remote {
+val fakeRepository = object : Repository {
     override suspend fun registerUser(
         userData: UserData,
         onSuccess: () -> Unit,

@@ -1,4 +1,4 @@
-package com.example.wppdabia.network
+package com.example.wppdabia.repository
 
 import androidx.core.net.toUri
 import com.example.wppdabia.data.ContactData
@@ -14,7 +14,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 
-class RemoteImpl : Remote {
+class RepositoryImpl : Repository {
 
     private val auth = FirebaseAuth.getInstance()
     private val storage = FirebaseStorage.getInstance()

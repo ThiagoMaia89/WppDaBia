@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.wppdabia.data.ContactData
 import com.example.wppdabia.data.UserData
-import com.example.wppdabia.network.Remote
+import com.example.wppdabia.repository.Repository
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(private val remote: Remote) : ViewModel() {
+class HomeViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
     private val _lastMessageCardViews = MutableStateFlow<List<ContactData>>(emptyList())
     val lastMessageCardViews: StateFlow<List<ContactData>> = _lastMessageCardViews
 
@@ -29,7 +29,7 @@ class HomeViewModel @Inject constructor(private val remote: Remote) : ViewModel(
     }
 
     private suspend fun getCurrentUser() {
-        remote.getCurrentUser(
+        repository.getCurrentUser(
             onSuccess = { userData ->
                 _currentUser.value = userData
             },
@@ -43,7 +43,7 @@ class HomeViewModel @Inject constructor(private val remote: Remote) : ViewModel(
         val currentUserUid = FirebaseAuth.getInstance().currentUser?.uid ?: return
         //_contactsLoading.value = true
         viewModelScope.launch {
-            remote.getAllChats(
+            repository.getAllChats(
                 currentUserUid = currentUserUid,
                 onSuccess = { chatList ->
                     _lastMessageCardViews.value = chatList

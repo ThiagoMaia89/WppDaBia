@@ -34,10 +34,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -47,7 +45,7 @@ import com.example.wppdabia.data.data_store.PreferencesManager
 import com.example.wppdabia.ui.SharedViewModel
 import com.example.wppdabia.ui.components.AppBaseContent
 import com.example.wppdabia.ui.components.MessageView
-import com.example.wppdabia.ui.mock.fakeRemote
+import com.example.wppdabia.ui.mock.fakeRepository
 
 @Composable
 fun MessageScreen(
@@ -157,8 +155,8 @@ fun MessageScreenPreview() {
     AppBaseContent(
         title = "Mensagem",
         onBackClick = {},
-        sharedViewModel = SharedViewModel(fakeRemote, PreferencesManager(LocalContext.current))
+        sharedViewModel = SharedViewModel(fakeRepository, PreferencesManager(LocalContext.current))
     ) {
-        MessageScreen(rememberNavController(), MessageViewModel(fakeRemote), "", "")
+        MessageScreen(rememberNavController(), MessageViewModel(fakeRepository), "", "")
     }
 }

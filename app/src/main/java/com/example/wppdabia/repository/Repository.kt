@@ -1,11 +1,11 @@
-package com.example.wppdabia.network
+package com.example.wppdabia.repository
 
 import com.example.wppdabia.data.ContactData
 import com.example.wppdabia.data.MessageData
 import com.example.wppdabia.data.UserData
 import kotlinx.coroutines.flow.Flow
 
-interface Remote {
+interface Repository {
 
     suspend fun registerUser(userData: UserData, onSuccess: () -> Unit, onError: (String) -> Unit)
 
