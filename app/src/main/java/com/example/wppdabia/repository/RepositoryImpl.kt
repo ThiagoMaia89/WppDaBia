@@ -46,7 +46,7 @@ class RepositoryImpl : Repository {
 
                 if (userData.profileImageUrl != null) {
                     val storageRef = storage.reference.child("$PROFILE_IMAGES/$userId.jpg")
-                    storageRef.putFile(userData.profileImageUrl.toUri())
+                    storageRef.putFile(userData.profileImageUrl!!.toUri())
                         .addOnSuccessListener {
                             storageRef.downloadUrl.addOnSuccessListener { downloadUri ->
                                 val user = mapOf(
@@ -150,13 +150,27 @@ class RepositoryImpl : Repository {
 
     override suspend fun fetchMessages(chatId: String): Flow<List<MessageData>> {
         val chatRef = database.getReference("$CHATS/$chatId")
+        val userRef = database.getReference(USERS)
+
         return callbackFlow {
             val listener = object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val messages = snapshot.children.mapNotNull {
                         it.getValue(MessageData::class.java)
                     }
-                    trySend(messages)
+                    messages.forEach { message ->
+                        val senderRef = userRef.child("${message.sender.uid}/$PROFILE_IMAGE_URL")
+                        senderRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onDataChange(senderSnapshot: DataSnapshot) {
+                                message.sender.profileImageUrl = senderSnapshot.getValue(String::class.java)
+                                trySend(messages)
+                            }
+
+                            override fun onCancelled(error: DatabaseError) {
+                                close(error.toException())
+                            }
+                        })
+                    }
                 }
 
                 override fun onCancelled(error: DatabaseError) {

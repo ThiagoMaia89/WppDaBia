@@ -1,6 +1,7 @@
 package com.example.wppdabia.ui.contacts
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -61,7 +62,9 @@ fun ContactsScreen(navController: NavController, viewModel: ContactsViewModel) {
         viewModel.errorMessage.value = null
     }
 
-    Column(modifier = Modifier.fillMaxSize().padding(24.dp)) {
+    Column(modifier = Modifier
+        .fillMaxSize()
+    ) {
         OutlinedTextField(
             value = searchQuery,
             onValueChange = { searchQuery = it },
@@ -88,7 +91,7 @@ fun ContactsScreen(navController: NavController, viewModel: ContactsViewModel) {
             colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = MaterialTheme.colorScheme.primary),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp),
+                .padding(vertical = 8.dp, horizontal = 8.dp),
             singleLine = true
         )
 
@@ -106,6 +109,7 @@ fun ContactsScreen(navController: NavController, viewModel: ContactsViewModel) {
 
             if (searchQuery.isEmpty()) {
                 Text(
+                    modifier = Modifier.padding(horizontal = 16.dp),
                     text = "Todos os usuários cadastrados:",
                     style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.primary),
                     textAlign = TextAlign.Start
@@ -115,16 +119,27 @@ fun ContactsScreen(navController: NavController, viewModel: ContactsViewModel) {
             LazyColumn {
                 val listToShow: List<ContactData>? =
                     if (searchQuery.isEmpty()) contacts else filteredContacts
-                itemsIndexed(listToShow ?: emptyList()) { _, contact ->
+                itemsIndexed(listToShow ?: emptyList()) { index, contact ->
                     ContactCardView(
                         contactData = contact,
                         onCardClick = {
                             viewModel.navigateToChat(
                                 contactId = contact.id,
                                 contactName = contact.name,
-                                navController = navController)
+                                navController = navController
+                            )
                         }
                     )
+                    if (listToShow?.isNotEmpty() == true) {
+                        if (index < (listToShow.size.minus(1)))
+                            Spacer(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp)
+                                    .height(1.dp)
+                                    .background(color = MaterialTheme.colorScheme.primary)
+                            )
+                    }
                 }
             }
         }

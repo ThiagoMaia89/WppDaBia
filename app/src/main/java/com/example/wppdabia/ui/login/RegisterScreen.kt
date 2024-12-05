@@ -90,6 +90,10 @@ fun RegisterScreen(
     val registerLoading = viewModel.registerLoading.collectAsState().value
     lateinit var imageHandler: ImageHandler
 
+    var userNameError by remember { mutableStateOf(false) }
+    var emailError by remember { mutableStateOf(false) }
+    var passwordError by remember { mutableStateOf(false) }
+
     var requestPermission by remember { mutableStateOf(false) }
     var permissionDeniedToast by remember { mutableStateOf(false) }
     var cropErrorToast by remember { mutableStateOf(false) }
@@ -215,13 +219,17 @@ fun RegisterScreen(
             value = userName,
             shape = MaterialTheme.shapes.small,
             colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = MaterialTheme.colorScheme.primary),
-            onValueChange = { userName = it },
+            onValueChange = {
+                userName = it
+                userNameError = userName.isBlank()
+            },
             label = {
                 Text(
                     text = "Nome de usuário",
                     color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
                 )
             },
+            isError = userNameError,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,
                 imeAction = ImeAction.Next
@@ -238,13 +246,17 @@ fun RegisterScreen(
             value = email,
             shape = MaterialTheme.shapes.small,
             colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = MaterialTheme.colorScheme.primary),
-            onValueChange = { email = it },
+            onValueChange = {
+                email = it
+                emailError = email.isBlank()
+            },
             label = {
                 Text(
                     text = "Email",
                     color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
                 )
             },
+            isError = emailError,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,
                 imeAction = ImeAction.Next
@@ -261,13 +273,17 @@ fun RegisterScreen(
             shape = MaterialTheme.shapes.small,
             colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = MaterialTheme.colorScheme.primary),
             value = password,
-            onValueChange = { password = it },
+            onValueChange = {
+                password = it
+                passwordError = password.isBlank()
+            },
             label = {
                 Text(
-                    text = "Password",
+                    text = "Senha",
                     color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
                 )
             },
+            isError = passwordError,
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
@@ -323,6 +339,10 @@ fun RegisterScreen(
                     contentColor = Color.White
                 ),
                 onClick = {
+                    userNameError = userName.isBlank()
+                    emailError = email.isBlank()
+                    passwordError = password.isBlank()
+
                     if (userName.isNotBlank() && email.isNotBlank() && password.isNotBlank()) {
                         viewModel.viewModelScope.launch {
                             viewModel.registerUser(

@@ -42,20 +42,21 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
 
     Column(modifier = Modifier
         .fillMaxSize()
-        .padding(24.dp)) {
+    ) {
         if (currentUser != null) {
             Text(
+                modifier = Modifier.padding(start = 16.dp, top = 16.dp),
                 text = "Olá, ${currentUser.name.getFirstName()}!",
                 style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.primary)
             )
         }
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
         Box(modifier = Modifier.fillMaxSize()) {
             if (lastMessages.isEmpty()) {
                 NoMessageAlert()
             } else {
                 LazyColumn {
-                    itemsIndexed(lastMessages) { _, contact ->
+                    itemsIndexed(lastMessages) { index, contact ->
                         val wasRead = if (contact.lastMessage?.sender?.uid == currentUser?.uid) true else contact.wasRead
                         LastMessageCardView(
                             contact = contact.copy(wasRead = wasRead),
@@ -69,7 +70,7 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
             FloatingActionButton(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(bottom = 2.dp, end = 2.dp),
+                    .padding(bottom = 16.dp, end = 16.dp),
                 containerColor = MaterialTheme.colorScheme.primary,
                 elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation(defaultElevation = 2.dp),
                 shape = RoundedCornerShape(180.dp),

@@ -191,6 +191,7 @@ fun WppDaBiaTopBar(
                         .wrapContentHeight()
                         .wrapContentWidth()
                         .size(24.dp)
+                        .shadow(elevation = 2.dp, shape = RoundedCornerShape(180.dp))
                         .background(
                             color = MaterialTheme.colorScheme.onPrimary,
                             shape = RoundedCornerShape(180.dp)

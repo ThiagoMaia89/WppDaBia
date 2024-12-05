@@ -11,14 +11,12 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private val preferencesManager by lazy { PreferencesManager(applicationContext) }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
             NavigationHandler(
-                preferencesManager = preferencesManager,
+                context = applicationContext,
                 onLogout = { restartApp() }
             )
         }

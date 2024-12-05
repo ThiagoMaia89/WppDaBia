@@ -1,6 +1,7 @@
 package com.example.wppdabia.ui.navigation
 
 import android.app.Activity
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -27,16 +28,15 @@ import com.example.wppdabia.ui.login.RegisterScreen
 import com.example.wppdabia.ui.login.RegisterViewModel
 import com.example.wppdabia.ui.messages.MessageScreen
 import com.example.wppdabia.ui.messages.MessageViewModel
+import com.example.wppdabia.ui.splash.SplashScreen
 
 @Composable
-fun NavigationHandler(preferencesManager: PreferencesManager, onLogout: () -> Unit) {
+fun NavigationHandler(context: Context, onLogout: () -> Unit) {
     val navigationController = rememberNavController()
-    val isRegistered by preferencesManager.isRegistered().collectAsState(initial = false)
-    val context = LocalContext.current
     val sharedViewModel: SharedViewModel = hiltViewModel()
     var loginMade by remember { mutableStateOf(false) }
 
-    var logout = sharedViewModel.logout.observeAsState().value
+    val logout = sharedViewModel.logout.observeAsState().value
 
     LaunchedEffect(Unit) {
         sharedViewModel.getCurrentUser()
@@ -52,9 +52,17 @@ fun NavigationHandler(preferencesManager: PreferencesManager, onLogout: () -> Un
         }
     }
 
-    val startDestination = if (isRegistered) Screen.Home.route else Screen.Register.route
+    NavHost(navController = navigationController, startDestination = Screen.Splash.route) {
+        composable(route = Screen.Splash.route) {
+            AppBaseContent(title = "", onBackClick = {}, sharedViewModel = sharedViewModel) {
+                SplashScreen(
+                    context = context,
+                    navigateToHome = { navigationController.navigate(Screen.Home.route) },
+                    navigateToRegister = { navigationController.navigate(Screen.Register.route) }
+                )
+            }
+        }
 
-    NavHost(navController = navigationController, startDestination = startDestination) {
         composable(route = Screen.Register.route) {
             AppBaseContent(
                 title = Screen.Register.title,
@@ -129,6 +137,7 @@ fun NavigationHandler(preferencesManager: PreferencesManager, onLogout: () -> Un
 }
 
 sealed class Screen(val route: String, val title: String = "") {
+    data object Splash : Screen(route = "splash_screen")
     data object Register : Screen(route = "login_screen", title = "Cadastro")
     data object Home : Screen(route = "home_screen", title = "Wpp da Bia")
     data object Contacts : Screen(route = "contacts_screen", title = "Contatos")

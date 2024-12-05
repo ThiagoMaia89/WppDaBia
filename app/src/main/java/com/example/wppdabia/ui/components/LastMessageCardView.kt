@@ -58,15 +58,17 @@ fun LastMessageCardView(contact: ContactData, onClick: () -> Unit) {
         }
     }
 
-    Column {
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .clickable {
+            onClick.invoke()
+        }
+    ) {
         Row(
             modifier = Modifier
                 .wrapContentHeight()
                 .fillMaxWidth()
-                .padding(8.dp)
-                .clickable {
-                    onClick.invoke()
-                },
+                .padding(horizontal = 8.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
@@ -153,10 +155,6 @@ fun LastMessageCardView(contact: ContactData, onClick: () -> Unit) {
                 }
             }
         }
-        Spacer(modifier = Modifier
-            .fillMaxWidth()
-            .height(1.dp)
-            .background(color = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)))
 
         if (showImageDialog) {
             ImageDialog(contact.profileImageUrl) {

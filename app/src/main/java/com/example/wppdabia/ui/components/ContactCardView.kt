@@ -46,15 +46,16 @@ fun ContactCardView(
 
     var showImageDialog by remember { mutableStateOf(false) }
 
-    Column {
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .clickable {
+            onCardClick.invoke()
+        }) {
         Row(
             modifier = modifier
                 .wrapContentHeight()
                 .fillMaxWidth()
-                .padding(8.dp)
-                .clickable {
-                    onCardClick.invoke()
-                },
+                .padding(horizontal = 8.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
@@ -71,8 +72,8 @@ fun ContactCardView(
                 if (contactData.profileImageUrl != null) {
                     Image(
                         modifier = Modifier
-                            .size(48.dp).
-                            clip(RoundedCornerShape(180.dp))
+                            .size(48.dp)
+                            .clip(RoundedCornerShape(180.dp))
                             .clickable {
                                 showImageDialog = true
                             },
@@ -99,20 +100,17 @@ fun ContactCardView(
                     modifier = Modifier.wrapContentHeight(),
                     text = contactData.name,
                     style = Typography.bodySmall.merge(
-                        fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.primary
+                        fontSize = 16.sp
                     )
                 )
                 Text(
                     text = contactData.email,
                     style = Typography.bodySmall.copy(
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                        fontSize = 14.sp
                     )
                 )
             }
         }
-        Spacer(modifier = Modifier.fillMaxWidth().height(1.dp).background(color = MaterialTheme.colorScheme.primary))
 
         if (showImageDialog) {
             ImageDialog(contactData.profileImageUrl) {
