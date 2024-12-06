@@ -1,7 +1,7 @@
 package com.example.wppdabia.ui.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,11 +19,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,7 +30,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
-import coil.compose.rememberAsyncImagePainter
 import com.example.wppdabia.data.MessageData
 import com.example.wppdabia.data.UserData
 import com.example.wppdabia.ui.extensions.getDateFromTimeStamp
@@ -45,7 +39,11 @@ import com.example.wppdabia.ui.theme.Typography
 import com.example.wppdabia.ui.theme.WppDaBiaTheme
 
 @Composable
-fun MessageView(messageData: MessageData, isSentByUser: Boolean) {
+fun MessageView(
+    messageData: MessageData,
+    isSentByUser: Boolean,
+    onImageClick: () -> Unit = {}
+) {
     val datePaddingStart = if (isSentByUser) 0.dp else 40.dp
     val datePaddingEnd = if (isSentByUser) 40.dp else 0.dp
 
@@ -234,7 +232,10 @@ fun MessageView(messageData: MessageData, isSentByUser: Boolean) {
                         model = messageData.messageImage,
                         modifier = Modifier
                             .size(140.dp)
-                            .clip(RoundedCornerShape(16.dp)),
+                            .clip(RoundedCornerShape(16.dp))
+                            .clickable {
+                                onImageClick.invoke()
+                            },
                         contentDescription = "Imagem enviada",
                         contentScale = ContentScale.Crop,
                         loading = {

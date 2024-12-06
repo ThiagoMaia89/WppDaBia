@@ -59,6 +59,7 @@ import com.example.wppdabia.ui.SharedViewModel
 import com.example.wppdabia.ui.components.AppBaseContent
 import com.example.wppdabia.ui.components.MessageView
 import com.example.wppdabia.ui.components.bottomsheet.ChooseImageBottomSheet
+import com.example.wppdabia.ui.components.dialog.ImageDialog
 import com.example.wppdabia.ui.extensions.toUri
 import com.example.wppdabia.ui.mock.fakeRepository
 
@@ -75,6 +76,9 @@ fun MessageScreen(
     var showPhotoBottomSheet by remember { mutableStateOf(false) }
     val imageUrl = viewModel.capturedImageUri.observeAsState().value
     lateinit var imageHandler: ImageHandler
+
+    var showImageDialog by remember { mutableStateOf(false) }
+    var clickedImageUrl by remember { mutableStateOf<String?>(null) }
 
     val placeHolderText = if (imageUrl != null) "legenda" else "mensagem"
 
@@ -272,7 +276,14 @@ fun MessageScreen(
             items(messages) { message ->
                 val isSentByUser = message.sender.uid != contactId
                 viewModel.setMessageAsRead(chatId)
-                MessageView(messageData = message, isSentByUser = isSentByUser)
+                MessageView(
+                    messageData = message,
+                    isSentByUser = isSentByUser,
+                    onImageClick = {
+                        clickedImageUrl = message.messageImage
+                        showImageDialog = true
+                    }
+                )
             }
         }
         if (showPhotoBottomSheet) {
@@ -285,6 +296,13 @@ fun MessageScreen(
                     showPhotoBottomSheet = false
                 },
                 onDismiss = { showPhotoBottomSheet = false }
+            )
+        }
+
+        if (showImageDialog) {
+            ImageDialog(
+                imageUrl = clickedImageUrl,
+                onDismissRequest = { showImageDialog = false }
             )
         }
     }
