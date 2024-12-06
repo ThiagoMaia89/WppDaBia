@@ -4,15 +4,19 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
@@ -25,6 +29,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -68,9 +73,12 @@ fun MessageView(
         val topEndShape = if (isSentByUser) 0.dp else 8.dp
 
         if (isSentByUser) {
+            val configuration = LocalConfiguration.current
+            val screenWidth = configuration.screenWidthDp.dp
             Column(
                 modifier = Modifier
-                    .defaultMinSize(minWidth = 100.dp)
+                    .wrapContentSize()
+                    .widthIn(min = 80.dp, max = screenWidth.times(0.5f))
                     .shadow(1.dp, shape = RoundedCornerShape(8.dp))
                     .background(
                         color = MaterialTheme.colorScheme.primary,
@@ -81,7 +89,8 @@ fun MessageView(
                             bottomEnd = 8.dp
                         )
                     )
-                    .padding(8.dp)
+                    .padding(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 if (isUploading) {
                     CircularProgressIndicator(
@@ -121,13 +130,22 @@ fun MessageView(
                 }
                 if (messageData.messageText.isNotEmpty()) {
                     Text(
+                        modifier = Modifier.widthIn(min = 80.dp, max = screenWidth.times(0.5f)),
                         text = messageData.messageText,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        textAlign = TextAlign.Start
                     )
                 }
-
+                Spacer(
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .width(34.dp)
+                        .height(2.dp)
+                        .background(color = Color.White)
+                )
                 Text(
                     text = messageData.timestamp.getHourFromTimeStamp(),
+                    textAlign = TextAlign.Center,
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f)
                 )
@@ -225,67 +243,82 @@ fun MessageView(
                 }
             }
             Spacer(modifier = Modifier.width(8.dp))
-            Column(
-                modifier = Modifier
-                    .defaultMinSize(minWidth = 100.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.tertiary,
-                        shape = RoundedCornerShape(
-                            topStart = topStartShape,
-                            topEnd = topEndShape,
-                            bottomStart = 8.dp,
-                            bottomEnd = 8.dp
+            BoxWithConstraints {
+                val screenWidth = this.maxWidth
+                Column(
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .widthIn(min = 80.dp, max = screenWidth.times(0.5f))
+                        .background(
+                            color = MaterialTheme.colorScheme.tertiary,
+                            shape = RoundedCornerShape(
+                                topStart = topStartShape,
+                                topEnd = topEndShape,
+                                bottomStart = 8.dp,
+                                bottomEnd = 8.dp
+                            )
                         )
-                    )
-                    .padding(8.dp)
-            ) {
-                if (isUploading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(60.dp),
-                        strokeWidth = 2.dp,
-                        color = Color.White
-                    )
-                } else {
-                    if (messageData.messageImage != null) {
-                        SubcomposeAsyncImage(
-                            model = messageData.messageImage,
-                            modifier = Modifier
-                                .size(140.dp)
-                                .clip(RoundedCornerShape(16.dp))
-                                .clickable {
-                                    onImageClick.invoke()
+                        .padding(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    if (isUploading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(60.dp),
+                            strokeWidth = 2.dp,
+                            color = Color.White
+                        )
+                    } else {
+                        if (messageData.messageImage != null) {
+                            SubcomposeAsyncImage(
+                                model = messageData.messageImage,
+                                modifier = Modifier
+                                    .size(140.dp)
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .clickable {
+                                        onImageClick.invoke()
+                                    },
+                                contentDescription = "Imagem enviada",
+                                contentScale = ContentScale.Crop,
+                                loading = {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(60.dp),
+                                        strokeWidth = 2.dp,
+                                        color = Color.White
+                                    )
                                 },
-                            contentDescription = "Imagem enviada",
-                            contentScale = ContentScale.Crop,
-                            loading = {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(60.dp),
-                                    strokeWidth = 2.dp,
-                                    color = Color.White
-                                )
-                            },
-                            error = {
-                                Text(
-                                    text = "Erro ao carregar imagem",
-                                    color = Color.Red,
-                                    modifier = Modifier.size(140.dp),
-                                    textAlign = TextAlign.Center
-                                )
-                            }
+                                error = {
+                                    Text(
+                                        text = "Erro ao carregar imagem",
+                                        color = Color.Red,
+                                        modifier = Modifier.size(140.dp),
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            )
+                        }
+                    }
+                    if (messageData.messageText.isNotEmpty()) {
+                        Text(
+                            modifier = Modifier.widthIn(min = 80.dp, max = screenWidth.times(0.5f)),
+                            text = messageData.messageText,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            textAlign = TextAlign.Start
                         )
                     }
-                }
-                if (messageData.messageText.isNotEmpty()) {
+                    Spacer(
+                        modifier = Modifier
+                            .padding(top = 8.dp)
+                            .width(34.dp)
+                            .height(2.dp)
+                            .background(color = Color.White)
+                    )
                     Text(
-                        text = messageData.messageText,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        text = messageData.timestamp.getHourFromTimeStamp(),
+                        fontSize = 12.sp,
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f)
                     )
                 }
-                Text(
-                    text = messageData.timestamp.getHourFromTimeStamp(),
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f)
-                )
             }
         }
     }
@@ -299,8 +332,8 @@ fun MessageViewPreview() {
             MessageView(
                 messageData = MessageData(
                     sender = UserData(name = "Thiago Maia"),
-                    messageText = "Oi filhota! Tudo bem?",
-                    timestamp = "10:00 AM - 04/12/2024",
+                    messageText = "adoliamndasçndja piondjaidlç jaslçkdmna lçdmnsadlçknjalkdjadlçkmnaslkdnja lkçdja lçkdja lçkdja dlçkja çdlkja sldçknjasdlçkhajd laçkjdalçkdja dçlkajsd açkldja skd",
+                    timestamp = "10:00",
                     isSentByUser = true
                 ),
                 isSentByUser = true,
@@ -310,7 +343,7 @@ fun MessageViewPreview() {
                 messageData = MessageData(
                     sender = UserData(name = "Beatriz Maia"),
                     messageText = "Olá papai! Tudo bem sim!",
-                    timestamp = "10:05 AM - 04/12/2024",
+                    timestamp = "10:05",
                     isSentByUser = false
                 ),
                 isSentByUser = false,

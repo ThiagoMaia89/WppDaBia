@@ -52,7 +52,7 @@ class MessageViewModel @Inject constructor(private val repository: Repository) :
         image: String?,
         lastMessage: String
     ) {
-        _isUploading.value = true
+        if (image != null) _isUploading.value = true
         val senderId = currentUser.value?.uid
         _isSentByUser.value = senderId != contactId
         val newMessage = MessageData(
