@@ -87,7 +87,10 @@ fun MessageView(
                         model = messageData.messageImage,
                         modifier = Modifier
                             .size(140.dp)
-                            .clip(RoundedCornerShape(16.dp)),
+                            .clip(RoundedCornerShape(16.dp))
+                            .clickable {
+                                onImageClick.invoke()
+                            },
                         contentDescription = "Imagem enviada",
                         contentScale = ContentScale.Crop,
                         loading = {
