@@ -46,7 +46,6 @@ class SharedViewModel @Inject constructor(
 
     fun updateProfileImage(
         newImageUrl: String,
-        onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
         viewModelScope.launch {
@@ -54,7 +53,6 @@ class SharedViewModel @Inject constructor(
                 newImageUrl,
                 onSuccess = {
                     _currentUser.value = _currentUser.value?.copy(profileImageUrl = newImageUrl)
-                    onSuccess.invoke()
                 },
                 onError = {
                     onError.invoke(it)

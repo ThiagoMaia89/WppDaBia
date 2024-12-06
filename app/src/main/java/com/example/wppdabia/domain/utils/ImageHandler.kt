@@ -14,25 +14,28 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import com.yalantis.ucrop.UCrop
 import java.io.File
 
 class ImageHandler(
-    val onImageCaptured: (Bitmap) -> Unit,
+    val onImageCaptured: (Uri) -> Unit,
     val onImageSelected: (Uri) -> Unit,
     val onImageCropped: (Uri) -> Unit,
     val onCropError: (Boolean) -> Unit
 ) {
-    lateinit var cameraLauncher: ActivityResultLauncher<Void?>
+    private lateinit var cameraLauncher: ActivityResultLauncher<Uri>
     lateinit var galleryLauncher: ActivityResultLauncher<String>
     private lateinit var cropLauncher: ActivityResultLauncher<Intent>
+    private lateinit var capturedImageUri: Uri
 
     @Composable
     fun InitializeLaunchers() {
+
         cameraLauncher = rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.TakePicturePreview()
-        ) { bitmap ->
-            bitmap?.let { onImageCaptured(it) }
+            contract = ActivityResultContracts.TakePicture()
+        ) { isSaved ->
+            if (isSaved) onImageCaptured(capturedImageUri)
         }
 
         galleryLauncher = rememberLauncherForActivityResult(
@@ -50,6 +53,16 @@ class ImageHandler(
                     onCropError.invoke(true)
                 }
             }
+    }
+
+    fun captureImage(context: Context) {
+        val imageFile = File(context.cacheDir, "captured_image.jpg")
+        capturedImageUri = FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.fileprovider",
+            imageFile
+        )
+        cameraLauncher.launch(capturedImageUri)
     }
 
     @Composable
@@ -82,11 +95,11 @@ class ImageHandler(
         }
     }
 
-    fun startCrop(context: Context, sourceUri: Uri) {
+    fun startCrop(context: Context, sourceUri: Uri, isCircle: Boolean) {
         val destinationUri = Uri.fromFile(File(context.cacheDir, "cropped_image.jpg"))
 
         val options = UCrop.Options().apply {
-            setCircleDimmedLayer(true)
+            setCircleDimmedLayer(isCircle)
             setFreeStyleCropEnabled(false)
             setCompressionFormat(Bitmap.CompressFormat.PNG)
             setCompressionQuality(100)

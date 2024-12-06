@@ -100,11 +100,11 @@ fun RegisterScreen(
 
     imageHandler = remember {
         ImageHandler(
-            onImageCaptured = { bitmap ->
-                imageHandler.startCrop(context, bitmap.toUri(context))
+            onImageCaptured = { uri ->
+                imageHandler.startCrop(context, uri, true)
             },
             onImageSelected = { uri ->
-                imageHandler.startCrop(context, uri)
+                imageHandler.startCrop(context, uri, true)
             },
             onImageCropped = { croppedUri ->
                 viewModel.saveCapturedImage(croppedUri)
@@ -118,7 +118,7 @@ fun RegisterScreen(
     if (requestPermission) {
         imageHandler.RequestCameraPermission(
             onPermissionGranted = {
-                imageHandler.cameraLauncher.launch(null)
+                imageHandler.captureImage(context)
                 requestPermission = false
                 showPhotoBottomSheet = false
             },

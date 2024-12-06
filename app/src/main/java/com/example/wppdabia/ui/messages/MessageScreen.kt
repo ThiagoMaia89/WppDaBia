@@ -1,5 +1,6 @@
 package com.example.wppdabia.ui.messages
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -88,11 +89,11 @@ fun MessageScreen(
 
     imageHandler = remember {
         ImageHandler(
-            onImageCaptured = { bitmap ->
-                imageHandler.startCrop(context, bitmap.toUri(context))
+            onImageCaptured = { uri ->
+                imageHandler.startCrop(context, uri, false)
             },
             onImageSelected = { uri ->
-                imageHandler.startCrop(context, uri)
+                imageHandler.startCrop(context, uri, false)
             },
             onImageCropped = { croppedUri ->
                 viewModel.saveCapturedImage(croppedUri)
@@ -105,7 +106,7 @@ fun MessageScreen(
     if (requestPermission) {
         imageHandler.RequestCameraPermission(
             onPermissionGranted = {
-                imageHandler.cameraLauncher.launch(null)
+                imageHandler.captureImage(context)
                 requestPermission = false
                 showPhotoBottomSheet = false
             },

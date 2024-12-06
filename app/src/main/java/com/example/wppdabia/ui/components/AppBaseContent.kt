@@ -1,7 +1,6 @@
 package com.example.wppdabia.ui.components
 
 import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -50,7 +49,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
-import coil.compose.rememberAsyncImagePainter
 import com.example.wppdabia.R
 import com.example.wppdabia.data.UserData
 import com.example.wppdabia.data.data_store.PreferencesManager
@@ -59,7 +57,6 @@ import com.example.wppdabia.ui.SharedViewModel
 import com.example.wppdabia.ui.components.bottomsheet.ChooseImageBottomSheet
 import com.example.wppdabia.ui.components.dialog.ImageDialog
 import com.example.wppdabia.ui.extensions.getInitials
-import com.example.wppdabia.ui.extensions.toUri
 import com.example.wppdabia.ui.mock.fakeRepository
 import com.example.wppdabia.ui.theme.Typography
 import com.example.wppdabia.ui.theme.WppDaBiaTheme
@@ -110,7 +107,6 @@ fun WppDaBiaTopBar(
 ) {
     val context = LocalContext.current
     var showMenu by remember { mutableStateOf(false) }
-    var dropDownImageLoading by remember { mutableStateOf(false) }
     var showPhotoBottomSheet by remember { mutableStateOf(false) }
     lateinit var imageHandler: ImageHandler
     var requestPermission by remember { mutableStateOf(false) }
@@ -121,22 +117,17 @@ fun WppDaBiaTopBar(
 
     imageHandler = remember {
         ImageHandler(
-            onImageCaptured = { bitmap ->
-                imageHandler.startCrop(context, bitmap.toUri(context))
+            onImageCaptured = { uri ->
+                imageHandler.startCrop(context, uri, true)
             },
             onImageSelected = { uri ->
-                imageHandler.startCrop(context, uri)
+                imageHandler.startCrop(context, uri, true)
             },
             onImageCropped = { croppedUri ->
-                dropDownImageLoading = true
                 sharedViewModel.saveCapturedImage(croppedUri)
                 sharedViewModel.updateProfileImage(
                     newImageUrl = croppedUri.toString(),
-                    onSuccess = {
-                        dropDownImageLoading = false
-                    },
                     onError = {
-                        dropDownImageLoading = false
                         cropErrorToast = true
                     }
                 )
@@ -150,7 +141,7 @@ fun WppDaBiaTopBar(
     if (requestPermission) {
         imageHandler.RequestCameraPermission(
             onPermissionGranted = {
-                imageHandler.cameraLauncher.launch(null)
+                imageHandler.captureImage(context)
                 requestPermission = false
                 showPhotoBottomSheet = false
             },
