@@ -45,9 +45,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.SubcomposeAsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.example.wppdabia.R
 import com.example.wppdabia.data.UserData
@@ -193,7 +195,7 @@ fun WppDaBiaTopBar(
                         .size(24.dp)
                         .shadow(elevation = 2.dp, shape = RoundedCornerShape(180.dp))
                         .background(
-                            color = MaterialTheme.colorScheme.onPrimary,
+                            color = MaterialTheme.colorScheme.primary,
                             shape = RoundedCornerShape(180.dp)
                         )
                         .clickable {
@@ -202,20 +204,35 @@ fun WppDaBiaTopBar(
                     contentAlignment = Alignment.Center
                 ) {
                     if (!user?.profileImageUrl.isNullOrEmpty()) {
-                        Image(
+                        SubcomposeAsyncImage(
+                            model = user?.profileImageUrl,
                             modifier = Modifier
                                 .size(24.dp)
                                 .clip(RoundedCornerShape(180.dp)),
-                            painter = rememberAsyncImagePainter(user?.profileImageUrl),
-                            contentDescription = null,
-                            contentScale = ContentScale.FillBounds
+                            contentDescription = "Imagem profile",
+                            contentScale = ContentScale.FillBounds,
+                            loading = {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(12.dp),
+                                    strokeWidth = 2.dp,
+                                    color = Color.White
+                                )
+                            },
+                            error = {
+                                Text(
+                                    text = "Erro ao carregar imagem",
+                                    color = Color.Red,
+                                    modifier = Modifier.size(140.dp),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
                         )
                     } else {
                         Text(
                             text = user?.name?.getInitials() ?: "",
                             style = Typography.titleMedium.copy(
                                 fontSize = 12.sp,
-                                color = MaterialTheme.colorScheme.primary
+                                color = MaterialTheme.colorScheme.onPrimary
                             )
                         )
                     }
@@ -246,32 +263,31 @@ fun WppDaBiaTopBar(
                             contentAlignment = Alignment.Center
                         ) {
                             if (user?.profileImageUrl != null) {
-                                Image(
-                                    painter = rememberAsyncImagePainter(
-                                        model = user.profileImageUrl,
-                                        onLoading = {
-                                            dropDownImageLoading = true
-                                        },
-                                        onError = {
-                                            dropDownImageLoading = false
-                                        },
-                                        onSuccess = {
-                                            dropDownImageLoading = false
-                                        }
-                                    ),
-                                    contentDescription = "Imagem de perfil",
+                                SubcomposeAsyncImage(
+                                    model = user.profileImageUrl,
                                     modifier = Modifier
                                         .size(100.dp)
                                         .clip(CircleShape)
                                         .clickable {
                                             showImageDialog = true
                                         },
-                                )
-                            } else if (dropDownImageLoading) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(60.dp),
-                                    strokeWidth = 5.dp,
-                                    color = Color.White
+                                    contentDescription = "Imagem profile",
+                                    contentScale = ContentScale.FillBounds,
+                                    loading = {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.size(12.dp),
+                                            strokeWidth = 5.dp,
+                                            color = Color.White
+                                        )
+                                    },
+                                    error = {
+                                        Text(
+                                            text = "Erro ao carregar imagem",
+                                            color = Color.Red,
+                                            modifier = Modifier.size(140.dp),
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
                                 )
                             } else {
                                 Text(

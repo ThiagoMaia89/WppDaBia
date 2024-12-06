@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,10 +27,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.SubcomposeAsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.example.wppdabia.data.ContactData
 import com.example.wppdabia.ui.components.dialog.ImageDialog
@@ -70,16 +74,31 @@ fun ContactCardView(
                 contentAlignment = Alignment.Center
             ) {
                 if (contactData.profileImageUrl != null) {
-                    Image(
+                    SubcomposeAsyncImage(
+                        model = contactData.profileImageUrl,
                         modifier = Modifier
                             .size(48.dp)
                             .clip(RoundedCornerShape(180.dp))
                             .clickable {
                                 showImageDialog = true
                             },
-                        painter = rememberAsyncImagePainter(contactData.profileImageUrl),
-                        contentDescription = null,
-                        contentScale = ContentScale.FillBounds
+                        contentDescription = "Imagem profile",
+                        contentScale = ContentScale.FillBounds,
+                        loading = {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(12.dp),
+                                strokeWidth = 8.dp,
+                                color = Color.White
+                            )
+                        },
+                        error = {
+                            Text(
+                                text = "Erro ao carregar imagem",
+                                color = Color.Red,
+                                modifier = Modifier.size(140.dp),
+                                textAlign = TextAlign.Center
+                            )
+                        }
                     )
                 } else {
                     Text(

@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +19,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -37,14 +40,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.SubcomposeAsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.example.wppdabia.R
 import com.example.wppdabia.data.data_store.PreferencesManager
@@ -67,8 +73,10 @@ fun MessageScreen(
     val messages by viewModel.messages.collectAsState(initial = emptyList())
     var messageInput by remember { mutableStateOf("") }
     var showPhotoBottomSheet by remember { mutableStateOf(false) }
-    var imageUrl = viewModel.capturedImageUri.observeAsState().value
+    val imageUrl = viewModel.capturedImageUri.observeAsState().value
     lateinit var imageHandler: ImageHandler
+
+    val placeHolderText = if (imageUrl != null) "legenda" else "mensagem"
 
     var requestPermission by remember { mutableStateOf(false) }
     var permissionDeniedToast by remember { mutableStateOf(false) }
@@ -135,12 +143,73 @@ fun MessageScreen(
                     )
                 }
 
-                if (imageUrl == null) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    if (imageUrl != null) {
+                        Box(
+                            modifier = Modifier
+                                .size(140.dp)
+                                .background(
+                                    color = MaterialTheme.colorScheme.primary,
+                                    shape = RoundedCornerShape(16.dp)
+                                )
+                                .padding(8.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            SubcomposeAsyncImage(
+                                model = imageUrl,
+                                modifier = Modifier
+                                    .size(130.dp)
+                                    .clip(RoundedCornerShape(16.dp)),
+                                contentDescription = "Imagem enviada",
+                                contentScale = ContentScale.Crop,
+                                loading = {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(12.dp),
+                                        strokeWidth = 10.dp,
+                                        color = Color.White
+                                    )
+                                },
+                                error = {
+                                    Text(
+                                        text = "Erro ao carregar imagem",
+                                        color = Color.Red,
+                                        modifier = Modifier.size(140.dp),
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .background(
+                                        color = MaterialTheme.colorScheme.tertiary,
+                                        shape = RoundedCornerShape(180.dp)
+                                    )
+                                    .align(Alignment.TopEnd)
+                                    .padding(4.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                IconButton(
+                                    onClick = {
+                                        viewModel.cleanImageSent()
+                                    },
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Clear,
+                                        contentDescription = "Apagar foto",
+                                        tint = MaterialTheme.colorScheme.onTertiary
+                                    )
+                                }
+                            }
+                        }
+                    }
                     OutlinedTextField(
                         value = messageInput,
                         onValueChange = { messageInput = it },
                         modifier = Modifier
-                            .weight(1f)
                             .padding(horizontal = 8.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             unfocusedBorderColor = Color.Transparent,
@@ -150,7 +219,7 @@ fun MessageScreen(
                         ),
                         placeholder = {
                             Text(
-                                text = "Mensagem",
+                                text = placeHolderText,
                                 color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
                             )
                         },
@@ -160,23 +229,6 @@ fun MessageScreen(
                             keyboardType = KeyboardType.Text
                         ),
                     )
-                } else {
-                    Box(modifier = Modifier
-                        .weight(1f)
-                        .size(140.dp)
-                        .background(color = Color.Transparent, shape = RoundedCornerShape(16.dp)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = imageUrl
-                            ),
-                            modifier = Modifier
-                                .size(140.dp)
-                                .clip(RoundedCornerShape(16.dp)),
-                            contentDescription = "Imagem de perfil"
-                        )
-                    }
                 }
 
                 IconButton(

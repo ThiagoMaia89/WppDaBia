@@ -15,18 +15,26 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.SubcomposeAsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.example.wppdabia.data.MessageData
 import com.example.wppdabia.data.UserData
@@ -40,6 +48,7 @@ import com.example.wppdabia.ui.theme.WppDaBiaTheme
 fun MessageView(messageData: MessageData, isSentByUser: Boolean) {
     val datePaddingStart = if (isSentByUser) 0.dp else 40.dp
     val datePaddingEnd = if (isSentByUser) 40.dp else 0.dp
+
     Text(
         modifier = Modifier
             .fillMaxWidth()
@@ -52,7 +61,8 @@ fun MessageView(messageData: MessageData, isSentByUser: Boolean) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp).padding(bottom = 8.dp),
+            .padding(horizontal = 8.dp)
+            .padding(bottom = 8.dp),
         horizontalArrangement = if (isSentByUser) Arrangement.End else Arrangement.Start
     ) {
         val topStartShape = if (isSentByUser) 8.dp else 0.dp
@@ -74,16 +84,35 @@ fun MessageView(messageData: MessageData, isSentByUser: Boolean) {
                     )
                     .padding(8.dp)
             ) {
-                if(messageData.messageText.isNotEmpty()) Text(text = messageData.messageText, color = MaterialTheme.colorScheme.onPrimary)
-                if(messageData.messageImage != null) {
-                    Image(
-                        painter = rememberAsyncImagePainter(
-                            model = messageData.messageImage
-                        ),
+                if (messageData.messageImage != null) {
+                    SubcomposeAsyncImage(
+                        model = messageData.messageImage,
                         modifier = Modifier
                             .size(140.dp)
                             .clip(RoundedCornerShape(16.dp)),
-                        contentDescription = "Imagem de perfil"
+                        contentDescription = "Imagem enviada",
+                        contentScale = ContentScale.Crop,
+                        loading = {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(12.dp),
+                                strokeWidth = 8.dp,
+                                color = Color.White
+                            )
+                        },
+                        error = {
+                            Text(
+                                text = "Erro ao carregar imagem",
+                                color = Color.Red,
+                                modifier = Modifier.size(140.dp),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    )
+                }
+                if (messageData.messageText.isNotEmpty()) {
+                    Text(
+                        text = messageData.messageText,
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
 
@@ -106,13 +135,28 @@ fun MessageView(messageData: MessageData, isSentByUser: Boolean) {
                 contentAlignment = Alignment.Center
             ) {
                 if (!messageData.sender.profileImageUrl.isNullOrEmpty()) {
-                    Image(
+                    SubcomposeAsyncImage(
+                        model = messageData.sender.profileImageUrl,
                         modifier = Modifier
                             .size(24.dp)
                             .clip(RoundedCornerShape(180.dp)),
-                        painter = rememberAsyncImagePainter(messageData.sender.profileImageUrl),
-                        contentDescription = null,
-                        contentScale = ContentScale.FillBounds
+                        contentDescription = "Imagem profile",
+                        contentScale = ContentScale.FillBounds,
+                        loading = {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(12.dp),
+                                strokeWidth = 3.dp,
+                                color = Color.White
+                            )
+                        },
+                        error = {
+                            Text(
+                                text = "Erro ao carregar imagem",
+                                color = Color.Red,
+                                modifier = Modifier.size(140.dp),
+                                textAlign = TextAlign.Center
+                            )
+                        }
                     )
                 } else {
                     Text(
@@ -137,13 +181,28 @@ fun MessageView(messageData: MessageData, isSentByUser: Boolean) {
                 contentAlignment = Alignment.Center
             ) {
                 if (!messageData.sender.profileImageUrl.isNullOrEmpty()) {
-                    Image(
+                    SubcomposeAsyncImage(
+                        model = messageData.sender.profileImageUrl,
                         modifier = Modifier
                             .size(24.dp)
                             .clip(RoundedCornerShape(180.dp)),
-                        painter = rememberAsyncImagePainter(messageData.sender.profileImageUrl),
-                        contentDescription = null,
-                        contentScale = ContentScale.FillBounds
+                        contentDescription = "Imagem profile",
+                        contentScale = ContentScale.FillBounds,
+                        loading = {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(12.dp),
+                                strokeWidth = 3.dp,
+                                color = Color.White
+                            )
+                        },
+                        error = {
+                            Text(
+                                text = "Erro ao carregar imagem",
+                                color = Color.Red,
+                                modifier = Modifier.size(140.dp),
+                                textAlign = TextAlign.Center
+                            )
+                        }
                     )
                 } else {
                     Text(
@@ -170,7 +229,37 @@ fun MessageView(messageData: MessageData, isSentByUser: Boolean) {
                     )
                     .padding(8.dp)
             ) {
-                Text(text = messageData.messageText, color = MaterialTheme.colorScheme.onPrimary)
+                if (messageData.messageImage != null) {
+                    SubcomposeAsyncImage(
+                        model = messageData.messageImage,
+                        modifier = Modifier
+                            .size(140.dp)
+                            .clip(RoundedCornerShape(16.dp)),
+                        contentDescription = "Imagem enviada",
+                        contentScale = ContentScale.Crop,
+                        loading = {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(12.dp),
+                                strokeWidth = 8.dp,
+                                color = Color.White
+                            )
+                        },
+                        error = {
+                            Text(
+                                text = "Erro ao carregar imagem",
+                                color = Color.Red,
+                                modifier = Modifier.size(140.dp),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    )
+                }
+                if (messageData.messageText.isNotEmpty()) {
+                    Text(
+                        text = messageData.messageText,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
                 Text(
                     text = messageData.timestamp.getHourFromTimeStamp(),
                     fontSize = 12.sp,

@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,11 +29,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.SubcomposeAsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.example.wppdabia.data.ContactData
 import com.example.wppdabia.data.MessageData
@@ -83,16 +87,31 @@ fun LastMessageCardView(contact: ContactData, onClick: () -> Unit) {
                 contentAlignment = Alignment.Center
             ) {
                 if (!contact.profileImageUrl.isNullOrEmpty()) {
-                    Image(
+                    SubcomposeAsyncImage(
+                        model = contact.profileImageUrl,
                         modifier = Modifier
                             .size(48.dp)
                             .clip(RoundedCornerShape(180.dp))
                             .clickable {
                                 showImageDialog = true
                             },
-                        painter = rememberAsyncImagePainter(contact.profileImageUrl),
-                        contentDescription = null,
-                        contentScale = ContentScale.FillBounds
+                        contentDescription = "Imagem enviada",
+                        contentScale = ContentScale.FillBounds,
+                        loading = {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(12.dp),
+                                strokeWidth = 8.dp,
+                                color = Color.White
+                            )
+                        },
+                        error = {
+                            Text(
+                                text = "Erro ao carregar imagem",
+                                color = Color.Red,
+                                modifier = Modifier.size(140.dp),
+                                textAlign = TextAlign.Center
+                            )
+                        }
                     )
                 } else {
                     Text(
@@ -117,9 +136,17 @@ fun LastMessageCardView(contact: ContactData, onClick: () -> Unit) {
                     )
                 )
                 val textHandled = if (contact.lastMessage?.sender?.uid != contact.id) {
-                    "Você: ${contact.lastMessage?.lastMessage?.ignoreLineBreak()}"
+                    if (contact.lastMessage?.messageText?.isEmpty() == true && contact.lastMessage.messageImage != null) {
+                        "Você: <imagem>"
+                    } else {
+                        "Você: ${contact.lastMessage?.lastMessage?.ignoreLineBreak()}"
+                    }
                 } else {
-                    contact.lastMessage.lastMessage.ignoreLineBreak()
+                    if (contact.lastMessage.messageText.isEmpty() && contact.lastMessage.messageImage != null) {
+                        "<imagem>"
+                    } else {
+                        contact.lastMessage.lastMessage.ignoreLineBreak()
+                    }
                 }
                 Text(
                     text = textHandled ?: "",

@@ -88,6 +88,7 @@ class ImageHandler(
         val options = UCrop.Options().apply {
             setCircleDimmedLayer(true)
             setFreeStyleCropEnabled(false)
+            setCompressionFormat(Bitmap.CompressFormat.PNG)
             setCompressionQuality(100)
         }
 
