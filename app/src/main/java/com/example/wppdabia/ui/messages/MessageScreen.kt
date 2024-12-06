@@ -294,7 +294,10 @@ fun MessageScreen(
                 onCameraClick = {
                     requestPermission = true
                 },
-                onGalleryClick = { imageHandler.galleryLauncher.launch("image/*") },
+                onGalleryClick = {
+                    imageHandler.galleryLauncher.launch("image/*")
+                    showPhotoBottomSheet = false
+                },
                 onDeleteClick = {
                     showPhotoBottomSheet = false
                 },

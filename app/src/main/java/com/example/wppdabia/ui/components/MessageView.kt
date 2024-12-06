@@ -84,11 +84,11 @@ fun MessageView(
                     .padding(8.dp)
             ) {
                 if (isUploading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(60.dp),
-                            strokeWidth = 2.dp,
-                            color = Color.White
-                        )
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(60.dp),
+                        strokeWidth = 2.dp,
+                        color = Color.White
+                    )
                 } else {
                     if (messageData.messageImage != null) {
                         SubcomposeAsyncImage(
