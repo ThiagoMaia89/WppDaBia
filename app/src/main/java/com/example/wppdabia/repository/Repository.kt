@@ -15,7 +15,7 @@ interface Repository {
 
     suspend fun getCurrentUser(onSuccess: (UserData?) -> Unit, onError: (String) -> Unit)
 
-    suspend fun sendMessage(chatId: String, message: MessageData)
+    suspend fun sendMessage(chatId: String, message: MessageData, onSuccess: () -> Unit, onError: () -> Unit)
 
     suspend fun fetchMessages(chatId: String): Flow<List<MessageData>>
 

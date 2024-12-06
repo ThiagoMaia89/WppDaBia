@@ -30,6 +30,9 @@ class MessageViewModel @Inject constructor(private val repository: Repository) :
 
     private val _isSentByUser = MutableStateFlow(false)
 
+    private val _isUploading = MutableStateFlow(false)
+    val isUploading: StateFlow<Boolean> = _isUploading
+
     init {
         viewModelScope.launch { getCurrentUser() }
     }
@@ -42,7 +45,14 @@ class MessageViewModel @Inject constructor(private val repository: Repository) :
         }
     }
 
-    fun sendMessage(chatId: String, contactId: String, text: String, image: String?, lastMessage: String) {
+    fun sendMessage(
+        chatId: String,
+        contactId: String,
+        text: String,
+        image: String?,
+        lastMessage: String
+    ) {
+        _isUploading.value = true
         val senderId = currentUser.value?.uid
         _isSentByUser.value = senderId != contactId
         val newMessage = MessageData(
@@ -53,7 +63,18 @@ class MessageViewModel @Inject constructor(private val repository: Repository) :
             isSentByUser = _isSentByUser.value,
             lastMessage = lastMessage
         )
-        viewModelScope.launch { repository.sendMessage(chatId, newMessage) }
+        viewModelScope.launch {
+            repository.sendMessage(
+                chatId,
+                newMessage,
+                onSuccess = {
+                    _isUploading.value = false
+                },
+                onError = {
+                    _isUploading.value = false
+                }
+            )
+        }
     }
 
     fun saveCapturedImage(uri: Uri) {

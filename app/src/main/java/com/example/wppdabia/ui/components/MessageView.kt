@@ -42,6 +42,7 @@ import com.example.wppdabia.ui.theme.WppDaBiaTheme
 fun MessageView(
     messageData: MessageData,
     isSentByUser: Boolean,
+    isUploading: Boolean,
     onImageClick: () -> Unit = {}
 ) {
     val datePaddingStart = if (isSentByUser) 0.dp else 40.dp
@@ -82,33 +83,41 @@ fun MessageView(
                     )
                     .padding(8.dp)
             ) {
-                if (messageData.messageImage != null) {
-                    SubcomposeAsyncImage(
-                        model = messageData.messageImage,
-                        modifier = Modifier
-                            .size(140.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .clickable {
-                                onImageClick.invoke()
+                if (isUploading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(60.dp),
+                            strokeWidth = 2.dp,
+                            color = Color.White
+                        )
+                } else {
+                    if (messageData.messageImage != null) {
+                        SubcomposeAsyncImage(
+                            model = messageData.messageImage,
+                            modifier = Modifier
+                                .size(140.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .clickable {
+                                    onImageClick.invoke()
+                                },
+                            contentDescription = "Imagem enviada",
+                            contentScale = ContentScale.Crop,
+                            loading = {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(60.dp),
+                                    strokeWidth = 2.dp,
+                                    color = Color.White
+                                )
                             },
-                        contentDescription = "Imagem enviada",
-                        contentScale = ContentScale.Crop,
-                        loading = {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(12.dp),
-                                strokeWidth = 8.dp,
-                                color = Color.White
-                            )
-                        },
-                        error = {
-                            Text(
-                                text = "Erro ao carregar imagem",
-                                color = Color.Red,
-                                modifier = Modifier.size(140.dp),
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    )
+                            error = {
+                                Text(
+                                    text = "Erro ao carregar imagem",
+                                    color = Color.Red,
+                                    modifier = Modifier.size(140.dp),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        )
+                    }
                 }
                 if (messageData.messageText.isNotEmpty()) {
                     Text(
@@ -230,33 +239,41 @@ fun MessageView(
                     )
                     .padding(8.dp)
             ) {
-                if (messageData.messageImage != null) {
-                    SubcomposeAsyncImage(
-                        model = messageData.messageImage,
-                        modifier = Modifier
-                            .size(140.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .clickable {
-                                onImageClick.invoke()
-                            },
-                        contentDescription = "Imagem enviada",
-                        contentScale = ContentScale.Crop,
-                        loading = {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(12.dp),
-                                strokeWidth = 8.dp,
-                                color = Color.White
-                            )
-                        },
-                        error = {
-                            Text(
-                                text = "Erro ao carregar imagem",
-                                color = Color.Red,
-                                modifier = Modifier.size(140.dp),
-                                textAlign = TextAlign.Center
-                            )
-                        }
+                if (isUploading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(60.dp),
+                        strokeWidth = 2.dp,
+                        color = Color.White
                     )
+                } else {
+                    if (messageData.messageImage != null) {
+                        SubcomposeAsyncImage(
+                            model = messageData.messageImage,
+                            modifier = Modifier
+                                .size(140.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .clickable {
+                                    onImageClick.invoke()
+                                },
+                            contentDescription = "Imagem enviada",
+                            contentScale = ContentScale.Crop,
+                            loading = {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(60.dp),
+                                    strokeWidth = 2.dp,
+                                    color = Color.White
+                                )
+                            },
+                            error = {
+                                Text(
+                                    text = "Erro ao carregar imagem",
+                                    color = Color.Red,
+                                    modifier = Modifier.size(140.dp),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        )
+                    }
                 }
                 if (messageData.messageText.isNotEmpty()) {
                     Text(
@@ -286,7 +303,8 @@ fun MessageViewPreview() {
                     timestamp = "10:00 AM - 04/12/2024",
                     isSentByUser = true
                 ),
-                isSentByUser = true
+                isSentByUser = true,
+                true
             )
             MessageView(
                 messageData = MessageData(
@@ -295,7 +313,8 @@ fun MessageViewPreview() {
                     timestamp = "10:05 AM - 04/12/2024",
                     isSentByUser = false
                 ),
-                isSentByUser = false
+                isSentByUser = false,
+                true
             )
         }
     }

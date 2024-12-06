@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -274,7 +275,7 @@ fun MessageScreen(
             verticalArrangement = Arrangement.Bottom,
             contentPadding = paddingValues
         ) {
-            items(messages) { message ->
+            itemsIndexed(messages) { index, message ->
                 val isSentByUser = message.sender.uid != contactId
                 viewModel.setMessageAsRead(chatId)
                 MessageView(
@@ -283,7 +284,8 @@ fun MessageScreen(
                     onImageClick = {
                         clickedImageUrl = message.messageImage
                         showImageDialog = true
-                    }
+                    },
+                    isUploading = if (index == messages.lastIndex) viewModel.isUploading.collectAsState().value else false
                 )
             }
         }

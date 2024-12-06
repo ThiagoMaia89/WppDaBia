@@ -145,7 +145,7 @@ class RepositoryImpl : Repository {
         }
     }
 
-    override suspend fun sendMessage(chatId: String, message: MessageData) {
+    override suspend fun sendMessage(chatId: String, message: MessageData, onSuccess: () -> Unit, onError: () -> Unit) {
         val chatRef = database.getReference("$CHATS/$chatId")
         val newMessageRef = chatRef.push()
 
@@ -161,7 +161,11 @@ class RepositoryImpl : Repository {
                                     "messageImage" to downloadUri.toString()
                                 )
                                 newMessageRef.updateChildren(messageUpdate)
+                                onSuccess.invoke()
                             }
+                        }
+                        .addOnFailureListener {
+                            onError.invoke()
                         }
                 }
             }
