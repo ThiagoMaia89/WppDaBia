@@ -1,5 +1,7 @@
 package com.example.wppdabia.ui.messages
 
+import android.net.Uri
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -21,6 +23,9 @@ class MessageViewModel @Inject constructor(private val repository: Repository) :
     private val _messages = MutableStateFlow<List<MessageData>>(emptyList())
     val messages: StateFlow<List<MessageData>> = _messages
 
+    private var _capturedImageUri = MutableLiveData<String?>()
+    val capturedImageUri: LiveData<String?> = _capturedImageUri
+
     private val currentUser = MutableLiveData<UserData?>()
 
     private val _isSentByUser = MutableStateFlow(false)
@@ -37,17 +42,22 @@ class MessageViewModel @Inject constructor(private val repository: Repository) :
         }
     }
 
-    fun sendMessage(chatId: String, contactId: String, content: String, lastMessage: String) {
+    fun sendMessage(chatId: String, contactId: String, text: String, image: String?, lastMessage: String) {
         val senderId = currentUser.value?.uid
         _isSentByUser.value = senderId != contactId
         val newMessage = MessageData(
             sender = currentUser.value ?: UserData(),
-            content = content,
+            messageText = text,
+            messageImage = image,
             timestamp = getCurrentTimestamp(),
             isSentByUser = _isSentByUser.value,
             lastMessage = lastMessage
         )
         viewModelScope.launch { repository.sendMessage(chatId, newMessage) }
+    }
+
+    fun saveCapturedImage(uri: Uri) {
+        _capturedImageUri.value = uri.toString()
     }
 
     fun setMessageAsRead(chatId: String) {
@@ -56,6 +66,10 @@ class MessageViewModel @Inject constructor(private val repository: Repository) :
                 repository.markMessagesAsRead(chatId, currentUser.value?.uid!!)
             }
         }
+    }
+
+    fun cleanImageSent() {
+        _capturedImageUri.value = null
     }
 
     private suspend fun getCurrentUser() {

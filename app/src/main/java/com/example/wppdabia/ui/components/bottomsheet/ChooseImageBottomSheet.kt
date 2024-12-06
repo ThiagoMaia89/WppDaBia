@@ -51,7 +51,7 @@ private fun ChooseImageBottomSheetContent(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 32.dp,top = 16.dp, start = 16.dp, end = 16.dp)
+            .padding(bottom = 32.dp, top = 16.dp, start = 16.dp, end = 16.dp)
     ) {
         Text(
             text = "Escolha uma opção",
@@ -73,15 +73,16 @@ private fun ChooseImageBottomSheetContent(
             text = "Acessar galeria",
             icon = R.drawable.ic_gallery
         )
-        Spacer(modifier = Modifier.height(4.dp))
-        BottomSheetButton(
-            onClick = {
-                onDeleteClick.invoke()
-            },
-            enabled = removePhotoEnabled,
-            text = "Remover foto",
-            icon = R.drawable.ic_delete_photo
-        )
+        if (removePhotoEnabled) {
+            Spacer(modifier = Modifier.height(4.dp))
+            BottomSheetButton(
+                onClick = {
+                    onDeleteClick.invoke()
+                },
+                text = "Remover foto",
+                icon = R.drawable.ic_delete_photo
+            )
+        }
     }
 }
 

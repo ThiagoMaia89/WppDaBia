@@ -10,6 +10,8 @@ object FirebasePathConstants {
     const val NAME = "name"
     const val EMAIL = "email"
     const val WAS_READ = "wasRead"
+    const val CHAT_IMAGES = "chat_images"
+    const val MESSAGE_IMAGE = "messageImage"
 
     const val SAVE_DATA_ERROR = "Erro ao salvar dados"
     const val UPLOAD_IMAGE_ERROR = "Erro ao fazer upload da imagem"

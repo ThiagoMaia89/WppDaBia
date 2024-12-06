@@ -5,9 +5,11 @@ import com.example.wppdabia.data.ContactData
 import com.example.wppdabia.data.MessageData
 import com.example.wppdabia.data.UserData
 import com.example.wppdabia.repository.FirebasePathConstants.CHATS
+import com.example.wppdabia.repository.FirebasePathConstants.CHAT_IMAGES
 import com.example.wppdabia.repository.FirebasePathConstants.CREATE_USER_ERROR
 import com.example.wppdabia.repository.FirebasePathConstants.DELETE_IMAGE_ERROR
 import com.example.wppdabia.repository.FirebasePathConstants.EMAIL
+import com.example.wppdabia.repository.FirebasePathConstants.MESSAGE_IMAGE
 import com.example.wppdabia.repository.FirebasePathConstants.NAME
 import com.example.wppdabia.repository.FirebasePathConstants.OBTAIN_IMAGE_ERROR
 import com.example.wppdabia.repository.FirebasePathConstants.PROFILE_IMAGES
@@ -145,7 +147,24 @@ class RepositoryImpl : Repository {
 
     override suspend fun sendMessage(chatId: String, message: MessageData) {
         val chatRef = database.getReference("$CHATS/$chatId")
-        chatRef.push().setValue(message)
+        val newMessageRef = chatRef.push()
+
+        newMessageRef.setValue(message.copy(messageImage = null))
+            .addOnSuccessListener {
+                if (message.messageImage != null) {
+                    val storageRef =
+                        storage.reference.child("$CHAT_IMAGES/$chatId/${message.timestamp.replace("/", "")}.jpg")
+                    storageRef.putFile(message.messageImage.toUri())
+                        .addOnSuccessListener {
+                            storageRef.downloadUrl.addOnSuccessListener { downloadUri ->
+                                val messageUpdate = mapOf(
+                                    "messageImage" to downloadUri.toString()
+                                )
+                                newMessageRef.updateChildren(messageUpdate)
+                            }
+                        }
+                }
+            }
     }
 
     override suspend fun fetchMessages(chatId: String): Flow<List<MessageData>> {
@@ -162,7 +181,8 @@ class RepositoryImpl : Repository {
                         val senderRef = userRef.child("${message.sender.uid}/$PROFILE_IMAGE_URL")
                         senderRef.addListenerForSingleValueEvent(object : ValueEventListener {
                             override fun onDataChange(senderSnapshot: DataSnapshot) {
-                                message.sender.profileImageUrl = senderSnapshot.getValue(String::class.java)
+                                message.sender.profileImageUrl =
+                                    senderSnapshot.getValue(String::class.java)
                                 trySend(messages)
                             }
 
@@ -207,9 +227,12 @@ class RepositoryImpl : Repository {
                                 database.reference.child(USERS).child(contactUid)
                                     .addListenerForSingleValueEvent(object : ValueEventListener {
                                         override fun onDataChange(contactSnapshot: DataSnapshot) {
-                                            val contactName = contactSnapshot.child(NAME).value as? String ?: ":("
-                                            val contactImage = contactSnapshot.child(PROFILE_IMAGE_URL).value as? String
-                                            val email = contactSnapshot.child(EMAIL).value as? String
+                                            val contactName =
+                                                contactSnapshot.child(NAME).value as? String ?: ":("
+                                            val contactImage =
+                                                contactSnapshot.child(PROFILE_IMAGE_URL).value as? String
+                                            val email =
+                                                contactSnapshot.child(EMAIL).value as? String
 
                                             chatPreviews.add(
                                                 ContactData(
@@ -224,9 +247,10 @@ class RepositoryImpl : Repository {
                                                 )
                                             )
 
-                                            val sortedChatPreviews = chatPreviews.sortedByDescending {
-                                                it.timestamp
-                                            }
+                                            val sortedChatPreviews =
+                                                chatPreviews.sortedByDescending {
+                                                    it.timestamp
+                                                }
                                             onSuccess(sortedChatPreviews)
                                         }
 
@@ -303,7 +327,8 @@ class RepositoryImpl : Repository {
 
         photoRef.delete()
             .addOnSuccessListener {
-                FirebaseDatabase.getInstance().getReference("$USERS/$userId/$PROFILE_IMAGE_URL").removeValue()
+                FirebaseDatabase.getInstance().getReference("$USERS/$userId/$PROFILE_IMAGE_URL")
+                    .removeValue()
                     .addOnSuccessListener { onSuccess() }
                     .addOnFailureListener { onError(DELETE_IMAGE_ERROR) }
             }

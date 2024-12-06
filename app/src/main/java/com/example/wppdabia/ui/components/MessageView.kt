@@ -74,7 +74,19 @@ fun MessageView(messageData: MessageData, isSentByUser: Boolean) {
                     )
                     .padding(8.dp)
             ) {
-                Text(text = messageData.content, color = MaterialTheme.colorScheme.onPrimary)
+                if(messageData.messageText.isNotEmpty()) Text(text = messageData.messageText, color = MaterialTheme.colorScheme.onPrimary)
+                if(messageData.messageImage != null) {
+                    Image(
+                        painter = rememberAsyncImagePainter(
+                            model = messageData.messageImage
+                        ),
+                        modifier = Modifier
+                            .size(140.dp)
+                            .clip(RoundedCornerShape(16.dp)),
+                        contentDescription = "Imagem de perfil"
+                    )
+                }
+
                 Text(
                     text = messageData.timestamp.getHourFromTimeStamp(),
                     fontSize = 12.sp,
@@ -158,7 +170,7 @@ fun MessageView(messageData: MessageData, isSentByUser: Boolean) {
                     )
                     .padding(8.dp)
             ) {
-                Text(text = messageData.content, color = MaterialTheme.colorScheme.onPrimary)
+                Text(text = messageData.messageText, color = MaterialTheme.colorScheme.onPrimary)
                 Text(
                     text = messageData.timestamp.getHourFromTimeStamp(),
                     fontSize = 12.sp,
@@ -177,7 +189,7 @@ fun MessageViewPreview() {
             MessageView(
                 messageData = MessageData(
                     sender = UserData(name = "Thiago Maia"),
-                    content = "Oi filhota! Tudo bem?",
+                    messageText = "Oi filhota! Tudo bem?",
                     timestamp = "10:00 AM - 04/12/2024",
                     isSentByUser = true
                 ),
@@ -186,7 +198,7 @@ fun MessageViewPreview() {
             MessageView(
                 messageData = MessageData(
                     sender = UserData(name = "Beatriz Maia"),
-                    content = "Olá papai! Tudo bem sim!",
+                    messageText = "Olá papai! Tudo bem sim!",
                     timestamp = "10:05 AM - 04/12/2024",
                     isSentByUser = false
                 ),
