@@ -9,13 +9,15 @@ interface Repository {
 
     suspend fun registerUser(userData: UserData, onSuccess: () -> Unit, onError: (String) -> Unit)
 
+    suspend fun registerUserToken()
+
     fun loginUser(userData: UserData, onSuccess: () -> Unit, onError: (String) -> Unit)
 
     suspend fun getAllContacts(onSuccess: (List<ContactData>) -> Unit, onError: (String) -> Unit)
 
     suspend fun getCurrentUser(onSuccess: (UserData?) -> Unit, onError: (String) -> Unit)
 
-    suspend fun sendMessage(chatId: String, message: MessageData, onSuccess: () -> Unit, onError: () -> Unit)
+    suspend fun sendMessage(chatId: String, message: MessageData, recipientId: String, onSuccess: () -> Unit, onError: () -> Unit)
 
     suspend fun fetchMessages(chatId: String): Flow<List<MessageData>>
 

@@ -65,8 +65,9 @@ class MessageViewModel @Inject constructor(private val repository: Repository) :
         )
         viewModelScope.launch {
             repository.sendMessage(
-                chatId,
-                newMessage,
+                chatId = chatId,
+                message = newMessage,
+                recipientId = contactId,
                 onSuccess = {
                     _isUploading.value = false
                 },

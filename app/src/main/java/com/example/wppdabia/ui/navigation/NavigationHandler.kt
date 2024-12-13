@@ -10,14 +10,12 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.wppdabia.data.data_store.PreferencesManager
 import com.example.wppdabia.ui.SharedViewModel
 import com.example.wppdabia.ui.components.AppBaseContent
 import com.example.wppdabia.ui.contacts.ContactsScreen

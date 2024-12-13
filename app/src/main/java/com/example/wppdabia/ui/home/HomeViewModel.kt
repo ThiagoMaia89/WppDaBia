@@ -24,7 +24,10 @@ class HomeViewModel @Inject constructor(private val repository: Repository) : Vi
     val currentUser: StateFlow<UserData?> = _currentUser
 
     init {
-        viewModelScope.launch { getCurrentUser() }
+        viewModelScope.launch {
+            getCurrentUser()
+            registerUserToken()
+        }
         getMessages()
     }
 
@@ -37,6 +40,10 @@ class HomeViewModel @Inject constructor(private val repository: Repository) : Vi
                 _currentUser.value = null
             }
         )
+    }
+
+    private suspend fun registerUserToken() {
+        repository.registerUserToken()
     }
 
     private fun getMessages() {

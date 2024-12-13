@@ -1,7 +1,7 @@
 package com.example.wppdabia.data
 
 data class MessageData(
-    val id: String = "",
+    val recipientId: String = "",
     val sender: UserData = UserData(),
     val messageText: String = "",
     val messageImage: String? = null,

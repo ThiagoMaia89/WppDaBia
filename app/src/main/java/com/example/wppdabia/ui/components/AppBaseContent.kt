@@ -285,6 +285,7 @@ fun WppDaBiaTopBar(
                                     text = user?.name?.getInitials() ?: "Desconhecido",
                                     style = Typography.titleMedium.copy(
                                         fontSize = 60.sp,
+                                        color = MaterialTheme.colorScheme.onPrimary
                                     )
                                 )
                             }

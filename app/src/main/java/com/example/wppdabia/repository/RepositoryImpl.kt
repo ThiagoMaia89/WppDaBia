@@ -9,7 +9,7 @@ import com.example.wppdabia.repository.FirebasePathConstants.CHAT_IMAGES
 import com.example.wppdabia.repository.FirebasePathConstants.CREATE_USER_ERROR
 import com.example.wppdabia.repository.FirebasePathConstants.DELETE_IMAGE_ERROR
 import com.example.wppdabia.repository.FirebasePathConstants.EMAIL
-import com.example.wppdabia.repository.FirebasePathConstants.MESSAGE_IMAGE
+import com.example.wppdabia.repository.FirebasePathConstants.FCM_TOKEN
 import com.example.wppdabia.repository.FirebasePathConstants.NAME
 import com.example.wppdabia.repository.FirebasePathConstants.OBTAIN_IMAGE_ERROR
 import com.example.wppdabia.repository.FirebasePathConstants.PROFILE_IMAGES
@@ -26,6 +26,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -36,6 +37,24 @@ class RepositoryImpl : Repository {
     private val auth = FirebaseAuth.getInstance()
     private val storage = FirebaseStorage.getInstance()
     private val database = FirebaseDatabase.getInstance()
+
+    override suspend fun registerUserToken() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                return@addOnCompleteListener
+            } else {
+                val token = task.result
+                val currentUser = auth.currentUser
+                val userUpdates = hashMapOf<String, Any>(
+                    FCM_TOKEN to token
+                )
+                if (currentUser != null) {
+                    val databaseReference = database.getReference(USERS).child(currentUser.uid)
+                    databaseReference.updateChildren(userUpdates)
+                }
+            }
+        }
+    }
 
     override suspend fun registerUser(
         userData: UserData,
@@ -145,30 +164,40 @@ class RepositoryImpl : Repository {
         }
     }
 
-    override suspend fun sendMessage(chatId: String, message: MessageData, onSuccess: () -> Unit, onError: () -> Unit) {
+    override suspend fun sendMessage(chatId: String, message: MessageData, recipientId: String, onSuccess: () -> Unit, onError: () -> Unit) {
         val chatRef = database.getReference("$CHATS/$chatId")
         val newMessageRef = chatRef.push()
 
-        newMessageRef.setValue(message.copy(messageImage = null))
-            .addOnSuccessListener {
-                if (message.messageImage != null) {
-                    val storageRef =
-                        storage.reference.child("$CHAT_IMAGES/$chatId/${message.timestamp.replace("/", "")}.jpg")
-                    storageRef.putFile(message.messageImage.toUri())
-                        .addOnSuccessListener {
-                            storageRef.downloadUrl.addOnSuccessListener { downloadUri ->
-                                val messageUpdate = mapOf(
-                                    "messageImage" to downloadUri.toString()
-                                )
-                                newMessageRef.updateChildren(messageUpdate)
+        if (message.messageImage != null) {
+            val storageRef = storage.reference.child("$CHAT_IMAGES/$chatId/${message.timestamp.replace("/", "")}.jpg")
+            storageRef.putFile(message.messageImage.toUri())
+                .addOnSuccessListener {
+                    storageRef.downloadUrl.addOnSuccessListener { downloadUri ->
+                        val messageWithImage = message.copy(
+                            recipientId = recipientId,
+                            messageImage = downloadUri.toString()
+                        )
+                        newMessageRef.setValue(messageWithImage)
+                            .addOnSuccessListener {
                                 onSuccess.invoke()
                             }
-                        }
-                        .addOnFailureListener {
-                            onError.invoke()
-                        }
+                            .addOnFailureListener {
+                                onError.invoke()
+                            }
+                    }
                 }
-            }
+                .addOnFailureListener {
+                    onError.invoke()
+                }
+        } else {
+            newMessageRef.setValue(message.copy(recipientId = recipientId))
+                .addOnSuccessListener {
+                    onSuccess.invoke()
+                }
+                .addOnFailureListener {
+                    onError.invoke()
+                }
+        }
     }
 
     override suspend fun fetchMessages(chatId: String): Flow<List<MessageData>> {

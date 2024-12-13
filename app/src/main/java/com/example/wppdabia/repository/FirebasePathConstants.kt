@@ -9,6 +9,7 @@ object FirebasePathConstants {
     const val PROFILE_IMAGE_URL = "profileImageUrl"
     const val NAME = "name"
     const val EMAIL = "email"
+    const val FCM_TOKEN = "fcmToken"
     const val WAS_READ = "wasRead"
     const val CHAT_IMAGES = "chat_images"
     const val MESSAGE_IMAGE = "messageImage"

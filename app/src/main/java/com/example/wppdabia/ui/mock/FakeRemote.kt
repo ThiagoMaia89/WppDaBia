@@ -14,6 +14,10 @@ val fakeRepository = object : Repository {
         onError: (String) -> Unit
     ) {}
 
+    override suspend fun registerUserToken() {
+        TODO("Not yet implemented")
+    }
+
     override fun loginUser(
         userData: UserData,
         onSuccess: () -> Unit,
@@ -26,8 +30,15 @@ val fakeRepository = object : Repository {
     ) {}
 
     override suspend fun getCurrentUser(onSuccess: (UserData?) -> Unit, onError: (String) -> Unit) {}
-
-    override suspend fun sendMessage(chatId: String, message: MessageData) {}
+    override suspend fun sendMessage(
+        chatId: String,
+        message: MessageData,
+        recipientId: String,
+        onSuccess: () -> Unit,
+        onError: () -> Unit
+    ) {
+        TODO("Not yet implemented")
+    }
 
     override suspend fun fetchMessages(chatId: String): Flow<List<MessageData>> {
         return flowOf()
