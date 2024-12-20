@@ -1,4 +1,4 @@
-package com.example.wppdabia
+package com.simplesoftware.wppdabia
 
 import org.junit.Test
 

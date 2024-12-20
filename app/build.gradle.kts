@@ -8,11 +8,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.wppdabia"
+    namespace = "com.simplesoftware.wppdabia"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.wppdabia"
+        applicationId = "com.simplesoftware.wppdabia"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
