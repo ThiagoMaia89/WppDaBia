@@ -19,3 +19,8 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+-keepclassmembers class * { public <init>(...); }
+-keep class com.simplesoftware.wppdabia.data.** { *; }
+-keepnames class com.simplesoftware.wppdabia.data.** { *; }
+-keep class com.google.firebase.** { *; }

@@ -13,8 +13,17 @@ import java.util.Locale
 
 fun String.getInitials(): String {
     val names = this.split(" ")
-    val initials = names.mapNotNull { it.firstOrNull() }.joinToString("")
-    return initials.uppercase().take(2)
+    var initials = ""
+    var letterNumbers = 0
+
+    if (names.size > 1) {
+        initials = names.mapNotNull { it.firstOrNull() }.joinToString("")
+        letterNumbers = 2
+    } else {
+        initials = names.firstOrNull()?.substring(0).toString()
+        letterNumbers = 1
+    }
+    return initials.uppercase().take(letterNumbers)
 }
 
 fun String.getFirstName(): String {
