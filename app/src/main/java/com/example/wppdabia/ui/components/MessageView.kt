@@ -92,41 +92,33 @@ fun MessageView(
                     .padding(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                if (isUploading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(60.dp),
-                        strokeWidth = 2.dp,
-                        color = Color.White
-                    )
-                } else {
-                    if (messageData.messageImage != null) {
-                        SubcomposeAsyncImage(
-                            model = messageData.messageImage,
-                            modifier = Modifier
-                                .size(140.dp)
-                                .clip(RoundedCornerShape(16.dp))
-                                .clickable {
-                                    onImageClick.invoke()
-                                },
-                            contentDescription = "Imagem enviada",
-                            contentScale = ContentScale.Crop,
-                            loading = {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(60.dp),
-                                    strokeWidth = 2.dp,
-                                    color = Color.White
-                                )
+                if (messageData.messageImage != null) {
+                    SubcomposeAsyncImage(
+                        model = messageData.messageImage,
+                        modifier = Modifier
+                            .size(140.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .clickable {
+                                onImageClick.invoke()
                             },
-                            error = {
-                                Text(
-                                    text = "Erro ao carregar imagem",
-                                    color = Color.Red,
-                                    modifier = Modifier.size(140.dp),
-                                    textAlign = TextAlign.Center
-                                )
-                            }
-                        )
-                    }
+                        contentDescription = "Imagem enviada",
+                        contentScale = ContentScale.Crop,
+                        loading = {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(60.dp),
+                                strokeWidth = 2.dp,
+                                color = Color.White
+                            )
+                        },
+                        error = {
+                            Text(
+                                text = "Erro ao carregar imagem",
+                                color = Color.Red,
+                                modifier = Modifier.size(140.dp),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    )
                 }
                 if (messageData.messageText.isNotEmpty()) {
                     Text(
@@ -261,41 +253,33 @@ fun MessageView(
                         .padding(8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    if (isUploading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(60.dp),
-                            strokeWidth = 2.dp,
-                            color = Color.White
-                        )
-                    } else {
-                        if (messageData.messageImage != null) {
-                            SubcomposeAsyncImage(
-                                model = messageData.messageImage,
-                                modifier = Modifier
-                                    .size(140.dp)
-                                    .clip(RoundedCornerShape(16.dp))
-                                    .clickable {
-                                        onImageClick.invoke()
-                                    },
-                                contentDescription = "Imagem enviada",
-                                contentScale = ContentScale.Crop,
-                                loading = {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.size(60.dp),
-                                        strokeWidth = 2.dp,
-                                        color = Color.White
-                                    )
+                    if (messageData.messageImage != null) {
+                        SubcomposeAsyncImage(
+                            model = messageData.messageImage,
+                            modifier = Modifier
+                                .size(140.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .clickable {
+                                    onImageClick.invoke()
                                 },
-                                error = {
-                                    Text(
-                                        text = "Erro ao carregar imagem",
-                                        color = Color.Red,
-                                        modifier = Modifier.size(140.dp),
-                                        textAlign = TextAlign.Center
-                                    )
-                                }
-                            )
-                        }
+                            contentDescription = "Imagem enviada",
+                            contentScale = ContentScale.Crop,
+                            loading = {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(60.dp),
+                                    strokeWidth = 2.dp,
+                                    color = Color.White
+                                )
+                            },
+                            error = {
+                                Text(
+                                    text = "Erro ao carregar imagem",
+                                    color = Color.Red,
+                                    modifier = Modifier.size(140.dp),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        )
                     }
                     if (messageData.messageText.isNotEmpty()) {
                         Text(

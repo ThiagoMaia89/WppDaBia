@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.wppdabia.data.MessageData
 import com.example.wppdabia.data.UserData
+import com.example.wppdabia.domain.utils.ChatStateManager
 import com.example.wppdabia.repository.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +19,10 @@ import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
-class MessageViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
+class MessageViewModel @Inject constructor(
+    private val repository: Repository,
+    private val chatStateManager: ChatStateManager
+) : ViewModel() {
 
     private val _messages = MutableStateFlow<List<MessageData>>(emptyList())
     val messages: StateFlow<List<MessageData>> = _messages
@@ -43,6 +47,10 @@ class MessageViewModel @Inject constructor(private val repository: Repository) :
                 _messages.value = fetchedMessages
             }
         }
+    }
+
+    fun setActiveChatUserId(userId: String?) {
+        chatStateManager.setActiveChatUserId(userId)
     }
 
     fun sendMessage(
@@ -73,6 +81,9 @@ class MessageViewModel @Inject constructor(private val repository: Repository) :
                 },
                 onError = {
                     _isUploading.value = false
+                },
+                onTemporaryMessageAdded = { tempMessage ->
+                    _messages.value += tempMessage
                 }
             )
         }
@@ -103,10 +114,6 @@ class MessageViewModel @Inject constructor(private val repository: Repository) :
                 currentUser.value = null
             }
         )
-    }
-
-    fun sendPhoto() {
-        //TODO: Enviar foto
     }
 
     private fun getCurrentTimestamp(): String {

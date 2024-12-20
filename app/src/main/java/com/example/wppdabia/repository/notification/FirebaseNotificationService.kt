@@ -9,16 +9,29 @@ import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.wppdabia.R
+import com.example.wppdabia.domain.utils.ChatStateManager
 import com.example.wppdabia.ui.activity.MainActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class FirebaseNotificationService : FirebaseMessagingService() {
+
+    @Inject
+    lateinit var chatStateManager: ChatStateManager
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
+
+        val senderId = message.data["senderId"]
+
+        if (chatStateManager.activeChatUserId.value == senderId) {
+            return
+        }
 
         val name = message.notification?.title
         val lastMessage = message.notification?.body

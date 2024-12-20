@@ -164,12 +164,30 @@ class RepositoryImpl : Repository {
         }
     }
 
-    override suspend fun sendMessage(chatId: String, message: MessageData, recipientId: String, onSuccess: () -> Unit, onError: () -> Unit) {
+    override suspend fun sendMessage(
+        chatId: String,
+        message: MessageData,
+        recipientId: String,
+        onSuccess: () -> Unit,
+        onError: () -> Unit,
+        onTemporaryMessageAdded: (MessageData) -> Unit,
+    ) {
         val chatRef = database.getReference("$CHATS/$chatId")
         val newMessageRef = chatRef.push()
 
         if (message.messageImage != null) {
-            val storageRef = storage.reference.child("$CHAT_IMAGES/$chatId/${message.timestamp.replace("/", "")}.jpg")
+
+            val tempMessage = message.copy(messageImage = message.messageImage.toUri().toString())
+            onTemporaryMessageAdded.invoke(tempMessage)
+
+            val storageRef = storage.reference.child(
+                "$CHAT_IMAGES/$chatId/${
+                    message.timestamp.replace(
+                        "/",
+                        ""
+                    )
+                }.jpg"
+            )
             storageRef.putFile(message.messageImage.toUri())
                 .addOnSuccessListener {
                     storageRef.downloadUrl.addOnSuccessListener { downloadUri ->

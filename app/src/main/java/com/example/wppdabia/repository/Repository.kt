@@ -17,13 +17,28 @@ interface Repository {
 
     suspend fun getCurrentUser(onSuccess: (UserData?) -> Unit, onError: (String) -> Unit)
 
-    suspend fun sendMessage(chatId: String, message: MessageData, recipientId: String, onSuccess: () -> Unit, onError: () -> Unit)
+    suspend fun sendMessage(
+        chatId: String,
+        message: MessageData,
+        recipientId: String,
+        onSuccess: () -> Unit,
+        onError: () -> Unit,
+        onTemporaryMessageAdded: (MessageData) -> Unit
+    )
 
     suspend fun fetchMessages(chatId: String): Flow<List<MessageData>>
 
-    suspend fun getAllChats(currentUserUid: String, onSuccess: (List<ContactData>) -> Unit, onError: (String) -> Unit)
+    suspend fun getAllChats(
+        currentUserUid: String,
+        onSuccess: (List<ContactData>) -> Unit,
+        onError: (String) -> Unit
+    )
 
-    suspend fun updateProfileImage(newImageUrl: String, onSuccess: () -> Unit, onError: (String) -> Unit)
+    suspend fun updateProfileImage(
+        newImageUrl: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    )
 
     suspend fun markMessagesAsRead(chatId: String, currentUserId: String)
 

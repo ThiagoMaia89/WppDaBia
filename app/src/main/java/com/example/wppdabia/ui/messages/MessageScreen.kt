@@ -31,6 +31,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -56,6 +57,7 @@ import coil.compose.SubcomposeAsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.example.wppdabia.R
 import com.example.wppdabia.data.data_store.PreferencesManager
+import com.example.wppdabia.domain.utils.ChatStateManager
 import com.example.wppdabia.domain.utils.ImageHandler
 import com.example.wppdabia.ui.SharedViewModel
 import com.example.wppdabia.ui.components.AppBaseContent
@@ -122,6 +124,16 @@ fun MessageScreen(
 
     LaunchedEffect(Unit) {
         viewModel.fetchMessages(chatId)
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.setActiveChatUserId(contactId)
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.setActiveChatUserId(null)
+        }
     }
 
     Scaffold(
@@ -322,6 +334,6 @@ fun MessageScreenPreview() {
         onBackClick = {},
         sharedViewModel = SharedViewModel(fakeRepository, PreferencesManager(LocalContext.current))
     ) {
-        MessageScreen(rememberNavController(), MessageViewModel(fakeRepository), "", "")
+        MessageScreen(rememberNavController(), MessageViewModel(fakeRepository, ChatStateManager()), "", "")
     }
 }
