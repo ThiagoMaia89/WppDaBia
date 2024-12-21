@@ -286,7 +286,8 @@ class RepositoryImpl : Repository {
                                             val email =
                                                 contactSnapshot.child(EMAIL).value as? String
 
-                                            chatPreviews.add(
+                                            chatPreviews.add (
+                                                index = 0,
                                                 ContactData(
                                                     id = contactUid,
                                                     name = contactName,
