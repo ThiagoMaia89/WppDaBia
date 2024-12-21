@@ -75,6 +75,15 @@ fun handleTimeStamp(timestamp: String): String {
     }
 }
 
+fun parseTimestampToMillis(timestamp: String): Long {
+    val format = SimpleDateFormat("HH:mm - dd/MM/yy", Locale.getDefault())
+    return try {
+        format.parse(timestamp)?.time ?: 0L
+    } catch (e: Exception) {
+        0L
+    }
+}
+
 fun String.getHourFromTimeStamp(): String {
     return this.split(" - ").firstOrNull() ?: this
 }

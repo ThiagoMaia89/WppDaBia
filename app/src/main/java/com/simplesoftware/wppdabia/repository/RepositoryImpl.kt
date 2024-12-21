@@ -28,6 +28,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.FirebaseStorage
+import com.simplesoftware.wppdabia.ui.extensions.parseTimestampToMillis
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -300,7 +301,7 @@ class RepositoryImpl : Repository {
 
                                             val sortedChatPreviews =
                                                 chatPreviews.sortedByDescending {
-                                                    it.timestamp
+                                                    parseTimestampToMillis(it.timestamp)
                                                 }
                                             onSuccess(sortedChatPreviews)
                                         }
