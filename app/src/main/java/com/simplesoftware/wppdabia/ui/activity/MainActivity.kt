@@ -3,6 +3,7 @@ package com.simplesoftware.wppdabia.ui.activity
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -17,8 +18,10 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+    @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
         setContent {
             NavigationHandler(
@@ -41,9 +44,11 @@ class MainActivity : ComponentActivity() {
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
-                Toast.makeText(this, "Permissão para notificações concedida.", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Permissão para notificações concedida.", Toast.LENGTH_LONG)
+                    .show()
             } else {
-                Toast.makeText(this, "Permissão para notificações negada.", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Permissão para notificações negada.", Toast.LENGTH_LONG)
+                    .show()
             }
         }
 
