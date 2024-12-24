@@ -1,8 +1,10 @@
 package com.simplesoftware.wppdabia.ui.messages
 
 import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,6 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -62,6 +65,8 @@ import com.simplesoftware.wppdabia.domain.utils.ImageHandler
 import com.simplesoftware.wppdabia.ui.SharedViewModel
 import com.simplesoftware.wppdabia.ui.components.AppBaseContent
 import com.simplesoftware.wppdabia.ui.components.MessageView
+import com.simplesoftware.wppdabia.ui.components.RecordAudioProgressView
+import com.simplesoftware.wppdabia.ui.components.RecordAudioProgressViewPreview
 import com.simplesoftware.wppdabia.ui.components.bottomsheet.ChooseImageBottomSheet
 import com.simplesoftware.wppdabia.ui.components.dialog.ImageDialog
 import com.simplesoftware.wppdabia.ui.extensions.toUri
@@ -89,6 +94,8 @@ fun MessageScreen(
     var requestPermission by remember { mutableStateOf(false) }
     var permissionDeniedToast by remember { mutableStateOf(false) }
     var cropErrorToast by remember { mutableStateOf(false) }
+
+    var isRecording by remember { mutableStateOf(false) }
 
     imageHandler = remember {
         ImageHandler(
@@ -139,136 +146,173 @@ fun MessageScreen(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(IntrinsicSize.Min)
-                    .padding(8.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.primary,
-                        shape = RoundedCornerShape(16.dp)
-                    )
-                    .padding(vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = {
-                    showPhotoBottomSheet = true
-                }) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_add_photo),
-                        contentDescription = "Enviar Foto",
-                        tint = MaterialTheme.colorScheme.onTertiary
+            Column {
+                if (isRecording) {
+                    RecordAudioProgressView(
+                        onRecordingComplete = {
+                            isRecording = false
+                        }
                     )
                 }
-
-                Column(
-                    modifier = Modifier.weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(IntrinsicSize.Min)
+                        .padding(8.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.primary,
+                            shape = RoundedCornerShape(16.dp)
+                        )
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (imageUrl != null) {
-                        Box(
-                            modifier = Modifier
-                                .size(140.dp)
-                                .background(
-                                    color = MaterialTheme.colorScheme.primary,
-                                    shape = RoundedCornerShape(16.dp)
-                                )
-                                .padding(8.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            SubcomposeAsyncImage(
-                                model = imageUrl,
-                                modifier = Modifier
-                                    .size(130.dp)
-                                    .clip(RoundedCornerShape(16.dp)),
-                                contentDescription = "Imagem enviada",
-                                contentScale = ContentScale.Crop,
-                                loading = {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.size(12.dp),
-                                        strokeWidth = 10.dp,
-                                        color = Color.White
-                                    )
-                                },
-                                error = {
-                                    Text(
-                                        text = "Erro ao carregar imagem",
-                                        color = Color.Red,
-                                        modifier = Modifier.size(140.dp),
-                                        textAlign = TextAlign.Center
-                                    )
-                                }
-                            )
+                    IconButton(onClick = {
+                        showPhotoBottomSheet = true
+                    }) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_add_photo),
+                            contentDescription = "Enviar Foto",
+                            tint = MaterialTheme.colorScheme.onTertiary
+                        )
+                    }
+
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        if (imageUrl != null) {
                             Box(
                                 modifier = Modifier
-                                    .size(32.dp)
+                                    .size(140.dp)
                                     .background(
-                                        color = MaterialTheme.colorScheme.tertiary,
-                                        shape = RoundedCornerShape(180.dp)
+                                        color = MaterialTheme.colorScheme.primary,
+                                        shape = RoundedCornerShape(16.dp)
                                     )
-                                    .align(Alignment.TopEnd)
-                                    .padding(4.dp),
+                                    .padding(8.dp),
                                 contentAlignment = Alignment.Center
                             ) {
-                                IconButton(
-                                    onClick = {
-                                        viewModel.cleanImageSent()
+                                SubcomposeAsyncImage(
+                                    model = imageUrl,
+                                    modifier = Modifier
+                                        .size(130.dp)
+                                        .clip(RoundedCornerShape(16.dp)),
+                                    contentDescription = "Imagem enviada",
+                                    contentScale = ContentScale.Crop,
+                                    loading = {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.size(12.dp),
+                                            strokeWidth = 10.dp,
+                                            color = Color.White
+                                        )
                                     },
+                                    error = {
+                                        Text(
+                                            text = "Erro ao carregar imagem",
+                                            color = Color.Red,
+                                            modifier = Modifier.size(140.dp),
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .size(32.dp)
+                                        .background(
+                                            color = MaterialTheme.colorScheme.tertiary,
+                                            shape = RoundedCornerShape(180.dp)
+                                        )
+                                        .align(Alignment.TopEnd)
+                                        .padding(4.dp),
+                                    contentAlignment = Alignment.Center
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Clear,
-                                        contentDescription = "Apagar foto",
-                                        tint = MaterialTheme.colorScheme.onTertiary
-                                    )
+                                    IconButton(
+                                        onClick = {
+                                            viewModel.cleanImageSent()
+                                        },
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Filled.Clear,
+                                            contentDescription = "Apagar foto",
+                                            tint = MaterialTheme.colorScheme.onTertiary
+                                        )
+                                    }
                                 }
                             }
                         }
+                        OutlinedTextField(
+                            value = messageInput,
+                            onValueChange = { messageInput = it },
+                            modifier = Modifier
+                                .padding(horizontal = 8.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                unfocusedBorderColor = Color.Transparent,
+                                focusedBorderColor = Color.Transparent,
+                                unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                                focusedContainerColor = MaterialTheme.colorScheme.background
+                            ),
+                            placeholder = {
+                                Text(
+                                    text = placeHolderText,
+                                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                                )
+                            },
+                            shape = RoundedCornerShape(16.dp),
+                            keyboardOptions = KeyboardOptions(
+                                capitalization = KeyboardCapitalization.Sentences,
+                                keyboardType = KeyboardType.Text
+                            ),
+                        )
                     }
-                    OutlinedTextField(
-                        value = messageInput,
-                        onValueChange = { messageInput = it },
+                    Box(
                         modifier = Modifier
-                            .padding(horizontal = 8.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedBorderColor = Color.Transparent,
-                            focusedBorderColor = Color.Transparent,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.background,
-                            focusedContainerColor = MaterialTheme.colorScheme.background
-                        ),
-                        placeholder = {
-                            Text(
-                                text = placeHolderText,
-                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-                            )
-                        },
-                        shape = RoundedCornerShape(16.dp),
-                        keyboardOptions = KeyboardOptions(
-                            capitalization = KeyboardCapitalization.Sentences,
-                            keyboardType = KeyboardType.Text
-                        ),
-                    )
-                }
-
-                IconButton(
-                    onClick = {
-                        if (messageInput.isNotBlank() || imageUrl != null) {
-                            viewModel.sendMessage(
-                                chatId = chatId,
-                                contactId = contactId,
-                                text = messageInput,
-                                image = imageUrl,
-                                lastMessage = messageInput
-                            )
-                            messageInput = ""
-                            viewModel.cleanImageSent()
-                        }
+                            .size(38.dp)
+                            .pointerInput(Unit) {
+                                detectTapGestures(
+                                    onPress = {
+                                        try {
+                                            isRecording = true
+                                            //audioRecorder.startRecording(context)
+                                            awaitRelease()
+                                            isRecording = false
+                                            //val audioUri = audioRecorder.stopRecording()
+                                            //audioUri?.let { onSendAudio(it) }
+                                        } catch (e: Exception) {
+                                            e.printStackTrace()
+                                        }
+                                    }
+                                )
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(if (isRecording) 38.dp else 24.dp),
+                            painter = painterResource(R.drawable.ic_mic),
+                            contentDescription = "Enviar Áudio",
+                            tint = MaterialTheme.colorScheme.onTertiary
+                        )
                     }
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.Send,
-                        contentDescription = "Enviar Mensagem",
-                        tint = MaterialTheme.colorScheme.onTertiary
-                    )
+
+                    IconButton(
+                        onClick = {
+                            if (messageInput.isNotBlank() || imageUrl != null) {
+                                viewModel.sendMessage(
+                                    chatId = chatId,
+                                    contactId = contactId,
+                                    text = messageInput,
+                                    image = imageUrl,
+                                    lastMessage = messageInput
+                                )
+                                messageInput = ""
+                                viewModel.cleanImageSent()
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Send,
+                            contentDescription = "Enviar Mensagem",
+                            tint = MaterialTheme.colorScheme.onTertiary
+                        )
+                    }
                 }
             }
         }
@@ -334,6 +378,11 @@ fun MessageScreenPreview() {
         onBackClick = {},
         sharedViewModel = SharedViewModel(fakeRepository, PreferencesManager(LocalContext.current))
     ) {
-        MessageScreen(rememberNavController(), MessageViewModel(fakeRepository, ChatStateManager()), "", "")
+        MessageScreen(
+            rememberNavController(),
+            MessageViewModel(fakeRepository, ChatStateManager()),
+            "",
+            ""
+        )
     }
 }
