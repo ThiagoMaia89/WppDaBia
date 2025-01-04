@@ -28,6 +28,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.FirebaseStorage
+import com.simplesoftware.wppdabia.repository.FirebasePathConstants.CHAT_AUDIOS
 import com.simplesoftware.wppdabia.ui.extensions.parseTimestampToMillis
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -171,6 +172,7 @@ class RepositoryImpl : Repository {
         recipientId: String,
         onSuccess: () -> Unit,
         onError: () -> Unit,
+        onAudioSuccess: () -> Unit,
         onTemporaryMessageAdded: (MessageData) -> Unit,
     ) {
         val chatRef = database.getReference("$CHATS/$chatId")
@@ -208,7 +210,34 @@ class RepositoryImpl : Repository {
                 .addOnFailureListener {
                     onError.invoke()
                 }
-        } else {
+        } else if (message.audioUrl != null) {
+            val tempMessage = message.copy(audioUrl = message.audioUrl)
+            onTemporaryMessageAdded.invoke(tempMessage)
+
+            val storageRef = storage.reference.child(
+                "$CHAT_AUDIOS/$chatId/${message.timestamp.replace("/", "")}.m4a"
+            )
+            storageRef.putFile(message.audioUrl.toUri())
+                .addOnSuccessListener {
+                    storageRef.downloadUrl.addOnSuccessListener { downloadUri ->
+                        val messageWithAudio = message.copy(
+                            recipientId = recipientId,
+                            audioUrl = downloadUri.toString(),
+                            audioDuration = message.audioDuration
+                        )
+                        newMessageRef.setValue(messageWithAudio)
+                            .addOnSuccessListener {
+                                onSuccess.invoke()
+                                onAudioSuccess.invoke()
+                            }
+                            .addOnFailureListener { onError.invoke() }
+                    }
+                }
+                .addOnFailureListener { onError.invoke() }
+        }
+
+
+        else {
             newMessageRef.setValue(message.copy(recipientId = recipientId))
                 .addOnSuccessListener {
                     onSuccess.invoke()

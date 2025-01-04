@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -20,9 +19,16 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,11 +36,17 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
+import androidx.media3.exoplayer.ExoPlayer
 import coil.compose.SubcomposeAsyncImage
+import com.simplesoftware.wppdabia.R
 import com.simplesoftware.wppdabia.data.MessageData
 import com.simplesoftware.wppdabia.data.UserData
 import com.simplesoftware.wppdabia.ui.extensions.getDateFromTimeStamp
@@ -42,6 +54,7 @@ import com.simplesoftware.wppdabia.ui.extensions.getHourFromTimeStamp
 import com.simplesoftware.wppdabia.ui.extensions.getInitials
 import com.simplesoftware.wppdabia.ui.theme.Typography
 import com.simplesoftware.wppdabia.ui.theme.WppDaBiaTheme
+import kotlinx.coroutines.delay
 
 @Composable
 fun MessageView(
@@ -52,6 +65,51 @@ fun MessageView(
 ) {
     val datePaddingStart = if (isSentByUser) 0.dp else 40.dp
     val datePaddingEnd = if (isSentByUser) 40.dp else 0.dp
+    val context = LocalContext.current
+
+    val exoPlayer = remember {
+        ExoPlayer.Builder(context).build().apply {
+            if (messageData.audioUrl != null) setMediaItem(MediaItem.fromUri(messageData.audioUrl))
+            prepare()
+        }
+    }
+    val audioProgress = remember { mutableLongStateOf(0L) }
+    val duration = remember { mutableLongStateOf(0L) }
+    val isPlaying = remember { mutableStateOf(false) }
+    val isAudioFinished = remember { mutableStateOf(false) }
+
+    DisposableEffect(exoPlayer) {
+        val listener = object : Player.Listener {
+            override fun onPlaybackStateChanged(state: Int) {
+                when (state) {
+                    Player.STATE_READY -> {
+                        duration.longValue = exoPlayer.duration
+                    }
+
+                    Player.STATE_ENDED -> {
+                        isAudioFinished.value = true
+                        isPlaying.value = false
+                    }
+
+                    Player.STATE_BUFFERING -> {}
+
+                    Player.STATE_IDLE -> {}
+                }
+            }
+        }
+        exoPlayer.addListener(listener)
+        onDispose {
+            exoPlayer.removeListener(listener)
+            exoPlayer.release()
+        }
+    }
+
+    LaunchedEffect(isPlaying.value) {
+        while (isPlaying.value) {
+            audioProgress.longValue = exoPlayer.currentPosition
+            delay(100)
+        }
+    }
 
     Text(
         modifier = Modifier
@@ -128,6 +186,60 @@ fun MessageView(
                         textAlign = TextAlign.Start
                     )
                 }
+
+                if (messageData.audioUrl != null) {
+
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+
+                        Icon(
+                            modifier = Modifier
+                                .size(32.dp)
+                                .clickable {
+                                    if (isPlaying.value) {
+                                        exoPlayer.pause()
+                                        isPlaying.value = false
+                                    } else {
+                                        if (isAudioFinished.value) {
+                                            exoPlayer.seekTo(0)
+                                            audioProgress.longValue = 0
+                                            isAudioFinished.value = false
+                                        }
+                                        exoPlayer.play()
+                                        isPlaying.value = true
+                                    }
+                                },
+                            painter = painterResource(
+                                if (isPlaying.value) R.drawable.ic_pause else R.drawable.ic_play
+                            ),
+                            contentDescription = "Ouvir Áudio",
+                            tint = MaterialTheme.colorScheme.onTertiary
+                        )
+
+                        LinearProgressIndicator(
+                            progress = {
+                                if (duration.longValue > 0) {
+                                    audioProgress.longValue / duration.longValue.toFloat()
+                                } else 0f
+                            },
+                            modifier = Modifier
+                                .height(20.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .weight(1f),
+                            color = MaterialTheme.colorScheme.onPrimary,
+                        )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Text(
+                            text = "${audioProgress.longValue / 1000}/${messageData.audioDuration}s",
+                            fontSize = 12.sp,
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f)
+                        )
+                    }
+                }
+
                 Spacer(
                     modifier = Modifier
                         .padding(top = 8.dp)
@@ -283,11 +395,64 @@ fun MessageView(
                     }
                     if (messageData.messageText.isNotEmpty()) {
                         Text(
-                            modifier = Modifier.widthIn(min = 80.dp, max = screenWidth.times(0.5f)),
+                            modifier = Modifier.widthIn(
+                                min = 80.dp,
+                                max = screenWidth.times(0.5f)
+                            ),
                             text = messageData.messageText,
                             color = MaterialTheme.colorScheme.onPrimary,
                             textAlign = TextAlign.Start
                         )
+                    }
+
+                    if (messageData.audioUrl != null) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .clickable {
+                                        if (isPlaying.value) {
+                                            exoPlayer.pause()
+                                            isPlaying.value = false
+                                        } else {
+                                            if (isAudioFinished.value) {
+                                                exoPlayer.seekTo(0)
+                                                audioProgress.longValue = 0
+                                                isAudioFinished.value = false
+                                            }
+                                            exoPlayer.play()
+                                            isPlaying.value = true
+                                        }
+                                    },
+                                painter = painterResource(
+                                    if (isPlaying.value) R.drawable.ic_pause else R.drawable.ic_play
+                                ),
+                                contentDescription = "Ouvir Áudio",
+                                tint = MaterialTheme.colorScheme.onTertiary
+                            )
+
+                            LinearProgressIndicator(
+                                progress = {
+                                    if (duration.longValue > 0) {
+                                        audioProgress.longValue / duration.longValue.toFloat()
+                                    } else 0f
+                                },
+                                modifier = Modifier
+                                    .height(20.dp)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .weight(1f),
+                                color = MaterialTheme.colorScheme.onPrimary,
+                            )
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            Text(
+                                text = "${audioProgress.longValue / 1000}/${messageData.audioDuration}s",
+                                fontSize = 12.sp,
+                                textAlign = TextAlign.Center,
+                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f)
+                            )
+                        }
                     }
                     Spacer(
                         modifier = Modifier
@@ -326,8 +491,9 @@ fun MessageViewPreview() {
             MessageView(
                 messageData = MessageData(
                     sender = UserData(name = "Beatriz Maia"),
-                    messageText = "Olá papai! Tudo bem sim!",
                     timestamp = "10:05",
+                    audioUrl = "",
+                    audioDuration = 17,
                     isSentByUser = false
                 ),
                 isSentByUser = false,

@@ -37,6 +37,9 @@ class MessageViewModel @Inject constructor(
     private val _isUploading = MutableStateFlow(false)
     val isUploading: StateFlow<Boolean> = _isUploading
 
+    private val _audioProgress = MutableStateFlow(false)
+    val audioProgress: StateFlow<Boolean> = _audioProgress
+
     init {
         viewModelScope.launch { getCurrentUser() }
     }
@@ -56,7 +59,9 @@ class MessageViewModel @Inject constructor(
     fun sendMessage(
         chatId: String,
         contactId: String,
-        text: String,
+        text: String? = null,
+        audioUrl: String? = null,
+        audioDuration: Int? = null,
         image: String?,
         lastMessage: String
     ) {
@@ -65,25 +70,33 @@ class MessageViewModel @Inject constructor(
         _isSentByUser.value = senderId != contactId
         val newMessage = MessageData(
             sender = currentUser.value ?: UserData(),
-            messageText = text,
+            messageText = text ?: "",
             messageImage = image,
+            audioUrl = audioUrl,
+            audioDuration = audioDuration,
             timestamp = getCurrentTimestamp(),
             isSentByUser = _isSentByUser.value,
             lastMessage = lastMessage
         )
         viewModelScope.launch {
+            if (audioUrl != null) _audioProgress.value = true
             repository.sendMessage(
                 chatId = chatId,
                 message = newMessage,
                 recipientId = contactId,
                 onSuccess = {
                     _isUploading.value = false
+                    _audioProgress.value = false
                 },
                 onError = {
                     _isUploading.value = false
+                    _audioProgress.value = false
                 },
                 onTemporaryMessageAdded = { tempMessage ->
                     _messages.value += tempMessage
+                },
+                onAudioSuccess = {
+                    _audioProgress.value = false
                 }
             )
         }

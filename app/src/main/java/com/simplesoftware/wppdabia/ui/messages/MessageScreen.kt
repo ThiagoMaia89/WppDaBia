@@ -1,9 +1,15 @@
 package com.simplesoftware.wppdabia.ui.messages
 
-import android.net.Uri
-import android.widget.Toast
-import androidx.compose.foundation.Image
+import android.Manifest
+import android.app.Activity
+import android.content.pm.PackageManager
+import android.icu.text.ListFormatter.Width
+import android.media.MediaPlayer
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,8 +21,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -54,22 +60,22 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.SubcomposeAsyncImage
-import coil.compose.rememberAsyncImagePainter
 import com.simplesoftware.wppdabia.R
 import com.simplesoftware.wppdabia.data.data_store.PreferencesManager
+import com.simplesoftware.wppdabia.domain.utils.AudioRecorder
 import com.simplesoftware.wppdabia.domain.utils.ChatStateManager
 import com.simplesoftware.wppdabia.domain.utils.ImageHandler
 import com.simplesoftware.wppdabia.ui.SharedViewModel
 import com.simplesoftware.wppdabia.ui.components.AppBaseContent
 import com.simplesoftware.wppdabia.ui.components.MessageView
 import com.simplesoftware.wppdabia.ui.components.RecordAudioProgressView
-import com.simplesoftware.wppdabia.ui.components.RecordAudioProgressViewPreview
 import com.simplesoftware.wppdabia.ui.components.bottomsheet.ChooseImageBottomSheet
 import com.simplesoftware.wppdabia.ui.components.dialog.ImageDialog
-import com.simplesoftware.wppdabia.ui.extensions.toUri
 import com.simplesoftware.wppdabia.ui.mock.fakeRepository
 
 @Composable
@@ -95,6 +101,7 @@ fun MessageScreen(
     var permissionDeniedToast by remember { mutableStateOf(false) }
     var cropErrorToast by remember { mutableStateOf(false) }
 
+    val audioRecorder = remember { AudioRecorder() }
     var isRecording by remember { mutableStateOf(false) }
 
     imageHandler = remember {
@@ -263,21 +270,63 @@ fun MessageScreen(
                             ),
                         )
                     }
+                    val animateToRecord = animateDpAsState(
+                        targetValue = if (isRecording) 80.dp else 38.dp,
+                        animationSpec = tween(durationMillis = 200),
+                        label = "animateToRecord"
+                    )
+
+                    val animateBackgroundToRecord = animateColorAsState(
+                        targetValue = if (isRecording) MaterialTheme.colorScheme.tertiary else Color.Transparent,
+                        animationSpec = tween(durationMillis = 200),
+                        label = "animateBackgroundToRecord"
+                    )
+
                     Box(
                         modifier = Modifier
-                            .size(38.dp)
+                            .size(animateToRecord.value)
+                            .background(color = animateBackgroundToRecord.value, shape = RoundedCornerShape(180.dp))
                             .pointerInput(Unit) {
                                 detectTapGestures(
                                     onPress = {
                                         try {
-                                            isRecording = true
-                                            //audioRecorder.startRecording(context)
-                                            awaitRelease()
-                                            isRecording = false
-                                            //val audioUri = audioRecorder.stopRecording()
-                                            //audioUri?.let { onSendAudio(it) }
+                                            if (ContextCompat.checkSelfPermission(
+                                                    context,
+                                                    Manifest.permission.RECORD_AUDIO
+                                                )
+                                                != PackageManager.PERMISSION_GRANTED
+                                            ) {
+                                                ActivityCompat.requestPermissions(
+                                                    context as Activity,
+                                                    arrayOf(Manifest.permission.RECORD_AUDIO),
+                                                    200
+                                                )
+                                            } else {
+                                                isRecording = true
+                                                audioRecorder.startRecording(context)
+                                                awaitRelease()
+                                                isRecording = false
+                                                val audioUri = audioRecorder.stopRecording()
+                                                audioUri?.let {
+                                                    val mediaPlayer = MediaPlayer().apply {
+                                                        setDataSource(context, it)
+                                                        prepare()
+                                                    }
+                                                    val audioDuration = mediaPlayer.duration / 1000
+                                                    mediaPlayer.release()
+                                                    viewModel.sendMessage(
+                                                        chatId = chatId,
+                                                        contactId = contactId,
+                                                        audioUrl = it.toString(),
+                                                        audioDuration = audioDuration,
+                                                        image = imageUrl,
+                                                        lastMessage = messageInput
+                                                    )
+                                                }
+                                            }
                                         } catch (e: Exception) {
                                             e.printStackTrace()
+                                            isRecording = false
                                         }
                                     }
                                 )
@@ -285,7 +334,7 @@ fun MessageScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            modifier = Modifier.size(if (isRecording) 38.dp else 24.dp),
+                            modifier = Modifier.size(if (isRecording) 62.dp else 24.dp),
                             painter = painterResource(R.drawable.ic_mic),
                             contentDescription = "Enviar Áudio",
                             tint = MaterialTheme.colorScheme.onTertiary

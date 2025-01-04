@@ -8,5 +8,7 @@ data class MessageData(
     val timestamp: String = "",
     val isSentByUser: Boolean = false,
     val lastMessage: String = "",
-    var wasRead: Boolean = false
+    var wasRead: Boolean = false,
+    val audioUrl: String? = null,
+    val audioDuration: Int? = null
 )

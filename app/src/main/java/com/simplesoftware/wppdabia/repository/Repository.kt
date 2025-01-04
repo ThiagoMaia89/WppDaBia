@@ -22,6 +22,7 @@ interface Repository {
         message: MessageData,
         recipientId: String,
         onSuccess: () -> Unit,
+        onAudioSuccess: () -> Unit,
         onError: () -> Unit,
         onTemporaryMessageAdded: (MessageData) -> Unit
     )

@@ -30,12 +30,12 @@ val fakeRepository = object : Repository {
     ) {}
 
     override suspend fun getCurrentUser(onSuccess: (UserData?) -> Unit, onError: (String) -> Unit) {}
-
     override suspend fun sendMessage(
         chatId: String,
         message: MessageData,
         recipientId: String,
         onSuccess: () -> Unit,
+        onAudioSuccess: () -> Unit,
         onError: () -> Unit,
         onTemporaryMessageAdded: (MessageData) -> Unit
     ) {
